@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 115 36" fill="none">
+  <!-- Rocket Icon Rounded Container -->
+  <g transform="translate(4, 3)">
+    <rect width="30" height="30" rx="7" fill="#8C3494"/>
+    <!-- Stylized Rocket -->
+    <path d="M15 5C15 5 10 11 10 18c0 2.5 1.5 4 2.5 5l2.5-1.5 2.5 1.5c1-1 2.5-2.5 2.5-5 0-7-5-13-5-13z" fill="#FFFFFF"/>
+    <circle cx="15" cy="13" r="2" fill="#8C3494"/>
+    <polygon points="9,19 7,22 11,21" fill="#FFA500"/>
+    <polygon points="21,19 23,22 19,21" fill="#FFA500"/>
+    <polygon points="13.5,23 16.5,23 15,27" fill="#FFA500"/>
+  </g>
+  <!-- Text -->
+  <text x="40" y="24" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="18" fill="#8C3494" letter-spacing="-0.3">
+    Rocket
+  </text>
+</svg>

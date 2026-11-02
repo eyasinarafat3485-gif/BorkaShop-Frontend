@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 115 36" fill="none">
+  <defs>
+    <linearGradient id="nagadGrad" x1="0" y1="0" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7941D"/>
+      <stop offset="1" stop-color="#E91D23"/>
+    </linearGradient>
+  </defs>
+  <!-- Nagad Swirl Symbol -->
+  <g transform="translate(4, 3) scale(0.72)">
+    <path d="M19 2C10.16 2 3 9.16 3 18s7.16 16 16 16c6.2 0 11.62-3.52 14.3-8.68l-6.8-2.64C24.86 25.1 22.1 27 19 27c-4.97 0-9-4.03-9-9s4.03-9 9-9c2.8 0 5.3 1.28 6.96 3.28l6.14-4.88C28.68 4.24 24.1 2 19 2z" fill="url(#nagadGrad)"/>
+    <circle cx="19" cy="18" r="5" fill="#E91D23"/>
+  </g>
+  <!-- Text -->
+  <text x="36" y="24" font-family="'Hind Siliguri', system-ui, sans-serif" font-weight="700" font-size="18" fill="#E91D23">
+    নগদ
+  </text>
+  <text x="73" y="22" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="11" fill="#F7941D" letter-spacing="0.5">
+    NAGAD
+  </text>
+</svg>

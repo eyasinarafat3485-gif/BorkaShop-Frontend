@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 115 36" fill="none">
+  <!-- Origami Bird -->
+  <g transform="translate(4, 3) scale(0.72)">
+    <polygon points="26,1 13,19 28,24" fill="#D82264"/>
+    <polygon points="13,19 0,17 9,29" fill="#E2136E"/>
+    <polygon points="9,29 28,24 23,39" fill="#C71759"/>
+    <polygon points="28,24 41,20 31,34" fill="#E2136E"/>
+    <polygon points="41,20 26,1 36,15" fill="#EA2E7E"/>
+  </g>
+  <!-- Text -->
+  <text x="40" y="24" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-weight="700" font-size="18" fill="#D82264" letter-spacing="-0.3">
+    bKash
+  </text>
+</svg>
