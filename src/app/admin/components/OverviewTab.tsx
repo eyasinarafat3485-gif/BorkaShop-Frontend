@@ -123,47 +123,47 @@ export default function OverviewTab({
   return (
     <div className="space-y-6">
       {/* 1. Executive Performance Center Banner (StyleHub Dark Theme Style) */}
-      <div className="bg-gradient-to-r from-zinc-950 via-[#2E1022] to-zinc-950 text-white rounded-3xl p-6 sm:p-8 border border-white/10 shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative overflow-hidden">
+      <div className="bg-gradient-to-r from-zinc-950 via-[#2E1022] to-zinc-950 text-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 lg:p-8 border border-white/10 shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3.5 sm:gap-6 relative overflow-hidden">
         {/* Glow accent */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-[#ff2056]/40 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 space-y-2 flex-1 min-w-0">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-amber-300 text-xs font-bold uppercase tracking-wider">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+        <div className="relative z-10 space-y-1.5 sm:space-y-2 flex-1 min-w-0">
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-white/10 border border-white/15 text-amber-300 text-[10px] sm:text-xs font-bold uppercase tracking-wider">
+            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span>Store Performance Center</span>
           </div>
-          <h2 className="text-xl sm:text-2xl lg:text-3xl font-serif font-black tracking-tight">
+          <h2 className="text-base sm:text-2xl lg:text-3xl font-serif font-black tracking-tight">
             BorkaShop Executive Overview
           </h2>
-          <p className="text-xs sm:text-sm text-zinc-300 max-w-xl leading-relaxed">
+          <p className="text-[11px] sm:text-sm text-zinc-300 max-w-xl leading-snug sm:leading-relaxed">
             Real-time synchronization with MongoDB Atlas orders, live guest checkouts, customer database, and active catalog products.
           </p>
         </div>
 
-        <div className="relative z-10 flex flex-wrap items-center gap-2.5 sm:gap-3 shrink-0">
+        <div className="relative z-10 grid grid-cols-3 sm:flex sm:flex-wrap items-center gap-1.5 sm:gap-3 w-full lg:w-auto shrink-0">
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="py-2.5 px-3.5 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl border border-white/10 transition-all cursor-pointer flex items-center gap-2 shadow-xs"
+            className="py-2 sm:py-2.5 px-1 sm:px-3.5 bg-white/10 hover:bg-white/20 text-white text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl border border-white/10 transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-2 shadow-xs whitespace-nowrap tracking-tight sm:tracking-normal"
             title="Refresh dashboard metrics"
           >
-            <FiRefreshCw size={14} className={isRefreshing ? "animate-spin text-amber-300" : ""} />
+            <FiRefreshCw size={12} className={`${isRefreshing ? "animate-spin text-amber-300" : ""} shrink-0 sm:w-3.5 sm:h-3.5`} />
             <span>Refresh Data</span>
           </button>
 
           <button
             onClick={() => setActiveTab("add-product")}
-            className="py-2.5 px-4 bg-[#ff2056] hover:bg-[#3D182D] text-white text-xs font-bold rounded-xl shadow-lg shadow-[#ff2056]/40 border border-white/15 transition-all cursor-pointer flex items-center gap-2"
+            className="py-2 sm:py-2.5 px-1 sm:px-4 bg-[#ff2056] hover:bg-[#3D182D] text-white text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl shadow-md sm:shadow-lg shadow-[#ff2056]/40 border border-white/15 transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-2 whitespace-nowrap tracking-tight sm:tracking-normal"
           >
-            <FiPlusCircle size={15} />
+            <FiPlusCircle size={13} className="shrink-0 sm:w-3.5 sm:h-3.5" />
             <span>+ Add Product</span>
           </button>
 
           <button
             onClick={() => setActiveTab("orders")}
-            className="py-2.5 px-4 bg-white text-zinc-900 hover:bg-zinc-100 text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-2"
+            className="py-2 sm:py-2.5 px-1 sm:px-4 bg-white text-zinc-900 hover:bg-zinc-100 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl shadow-xs sm:shadow-md transition-all cursor-pointer flex items-center justify-center gap-1 sm:gap-2 whitespace-nowrap tracking-tight sm:tracking-normal"
           >
-            <FiShoppingBag size={15} />
+            <FiShoppingBag size={13} className="shrink-0 sm:w-3.5 sm:h-3.5" />
             <span>Manage Orders</span>
           </button>
         </div>
@@ -252,13 +252,13 @@ export default function OverviewTab({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Left: Recent Orders Table */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-zinc-200/90 p-6 shadow-xs space-y-4">
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-zinc-200/90 p-3.5 sm:p-6 shadow-xs space-y-3 sm:space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
             <div>
-              <h3 className="text-base font-bold text-zinc-900 font-serif">
+              <h3 className="text-sm sm:text-base font-bold text-zinc-900 font-serif">
                 Recent Store Orders
               </h3>
-              <p className="text-xs text-zinc-500">Live order transactions from 1-click checkout</p>
+              <p className="text-[11px] sm:text-xs text-zinc-500">Live order transactions from 1-click checkout</p>
             </div>
             <button
               onClick={() => setActiveTab("orders")}
@@ -269,7 +269,56 @@ export default function OverviewTab({
             </button>
           </div>
 
-          <div className="overflow-x-auto">
+          {/* Mobile Card View (Zero Horizontal Scroll) */}
+          <div className="sm:hidden divide-y divide-zinc-100">
+            {orders.slice(0, 5).map((ord) => (
+              <div key={ord.id} className="py-2.5 px-0.5 space-y-1.5 hover:bg-zinc-50/60 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono font-bold text-xs text-zinc-900">{ord.id}</span>
+                    <span className="text-[10px] text-zinc-400 font-medium">({ord.items.length} item{ord.items.length > 1 ? "s" : ""})</span>
+                  </div>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                      ord.status === "Delivered"
+                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                        : ord.status === "Processing"
+                        ? "bg-blue-50 text-blue-700 border border-blue-200"
+                        : ord.status === "Shipped"
+                        ? "bg-purple-50 text-purple-700 border border-purple-200"
+                        : ord.status === "Cancelled"
+                        ? "bg-rose-50 text-rose-700 border border-rose-200"
+                        : "bg-amber-50 text-amber-700 border border-amber-200"
+                    }`}
+                  >
+                    {ord.status}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between text-xs">
+                  <div>
+                    <p className="font-bold text-zinc-800 text-xs">{ord.customerName}</p>
+                    <p className="text-[11px] text-zinc-400 font-mono">{ord.phone}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-[#ff2056] text-xs">
+                      ৳{ord.total.toLocaleString()}
+                    </span>
+                    <button
+                      onClick={() => onOpenOrderModal(ord.id)}
+                      className="p-1.5 rounded-lg bg-zinc-100 hover:bg-[#ff2056] hover:text-white text-zinc-700 transition-colors cursor-pointer"
+                      title="View Order Details & Receipt"
+                    >
+                      <FiEye size={13} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop & Tablet Table (Preserved) */}
+          <div className="hidden sm:block overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="bg-zinc-50 text-zinc-500 uppercase tracking-wider font-bold border-y border-zinc-100">
                 <tr>

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 const SLIDES = [
@@ -9,19 +10,19 @@ const SLIDES = [
     id: 1,
     image: "https://borkashop.borbila.net/wp-content/uploads/2026/08/ChatGPT-Image-Aug-21-2026-03_49_56-AM-1.png",
     title: "Borka Shop Eid Collection 2026",
-    link: "#eid-section",
+    link: "/shop",
   },
   {
     id: 2,
     image: "https://borkashop.borbila.net/wp-content/uploads/2026/08/ChatGPT-Image-Aug-21-2026-03_49_57-AM-2.png",
     title: "Exclusive Abaya & Burqa Collection",
-    link: "#abaya-section",
+    link: "/shop",
   },
   {
     id: 3,
     image: "https://borkashop.borbila.net/wp-content/uploads/2026/08/ChatGPT-Image-Aug-21-2026-03_49_57-AM-3.png",
     title: "Medina Silk Hijabs & Khimars",
-    link: "#hijab-section",
+    link: "/shop",
   },
 ];
 
@@ -40,13 +41,13 @@ export default function HeroSlider() {
 
   return (
     <section
-      className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 pt-3 sm:pt-5 pb-4"
+      className="relative w-full max-w-7xl mx-auto px-3 sm:px-6 pt-2.5 sm:pt-5 pb-3 sm:pb-4"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      <div className="relative w-full rounded-md sm:rounded-lg overflow-hidden aspect-[1916/821] shadow-sm bg-zinc-100">
+      <div className="relative w-full rounded-md sm:rounded-lg overflow-hidden min-h-[195px] aspect-[16/9] sm:min-h-0 sm:aspect-[1916/821] shadow-sm bg-zinc-100">
         {SLIDES.map((slide, index) => (
-          <a
+          <Link
             key={slide.id}
             href={slide.link}
             className={`absolute inset-0 transition-opacity duration-700 ease-in-out cursor-pointer ${
@@ -59,9 +60,9 @@ export default function HeroSlider() {
               fill
               sizes="(max-width: 1280px) 100vw, 1280px"
               priority={index === 0}
-              className="object-cover object-center"
+              className="object-fill sm:object-cover sm:object-center"
             />
-          </a>
+          </Link>
         ))}
 
         {/* Previous Button */}
@@ -70,10 +71,11 @@ export default function HeroSlider() {
             e.preventDefault();
             prev();
           }}
-          className="absolute left-2.5 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-[#4F213B] text-white flex items-center justify-center transition-all opacity-70 hover:opacity-100"
+          className="absolute left-1.5 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-[#4F213B] text-white flex items-center justify-center transition-all opacity-70 hover:opacity-100"
           aria-label="Previous Slide"
         >
-          <FiChevronLeft size={20} />
+          <FiChevronLeft size={16} className="sm:hidden" />
+          <FiChevronLeft size={20} className="hidden sm:block" />
         </button>
 
         {/* Next Button */}
@@ -82,10 +84,11 @@ export default function HeroSlider() {
             e.preventDefault();
             next();
           }}
-          className="absolute right-2.5 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-[#4F213B] text-white flex items-center justify-center transition-all opacity-70 hover:opacity-100"
+          className="absolute right-1.5 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-[#4F213B] text-white flex items-center justify-center transition-all opacity-70 hover:opacity-100"
           aria-label="Next Slide"
         >
-          <FiChevronRight size={20} />
+          <FiChevronRight size={16} className="sm:hidden" />
+          <FiChevronRight size={20} className="hidden sm:block" />
         </button>
 
         {/* Dots Pagination */}

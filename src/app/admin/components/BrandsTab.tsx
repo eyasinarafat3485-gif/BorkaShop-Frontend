@@ -98,23 +98,23 @@ export default function BrandsTab() {
   return (
     <div className="space-y-6">
       {/* 1. Header Card */}
-      <div className="bg-white rounded-2xl border border-zinc-200/90 p-5 shadow-xs flex items-center justify-between">
+      <div className="bg-white rounded-2xl border border-zinc-200/90 p-3.5 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h2 className="text-xl font-bold text-zinc-900 font-serif flex items-center gap-2">
+          <h2 className="text-base sm:text-xl font-bold text-zinc-900 font-serif flex items-center gap-2">
             <FiAward className="text-[#ff2056]" />
             <span>Brand Partners & Labels</span>
           </h2>
-          <p className="text-xs text-zinc-500 mt-0.5">
+          <p className="text-[11px] sm:text-xs text-zinc-500 mt-0.5">
             Manage fabric manufacturers, verified modest fashion brands, and designer labels
           </p>
         </div>
 
         <button
           onClick={() => setIsAdding(!isAdding)}
-          className="py-2 px-4 bg-[#ff2056] hover:bg-rose-600 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-xs shadow-rose-600/20"
+          className="py-1.5 px-3 sm:py-2 sm:px-4 bg-[#ff2056] hover:bg-rose-600 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs shadow-rose-600/20 whitespace-nowrap self-start sm:self-auto"
         >
-          <FiPlus size={15} />
-          <span>+ Add Brand</span>
+          <FiPlus size={14} />
+          <span>Add Brand</span>
         </button>
       </div>
 
@@ -188,38 +188,38 @@ export default function BrandsTab() {
       )}
 
       {/* Brands Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-4">
         {brands.map((b) => (
           <div
             key={b.id}
-            className="bg-white rounded-2xl border border-zinc-200/90 p-5 shadow-xs hover:border-[#ff2056]/40 transition-all flex flex-col justify-between"
+            className="bg-white rounded-xl sm:rounded-2xl border border-zinc-200/90 p-3 sm:p-5 shadow-xs hover:border-[#ff2056]/40 transition-all flex flex-col justify-between"
           >
-            <div className="flex items-start justify-between">
-              <div className="w-12 h-12 rounded-xl bg-rose-50 text-[#ff2056] font-serif font-black text-xl flex items-center justify-center border border-rose-100 shadow-xs">
+            <div className="flex items-start justify-between gap-1">
+              <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-rose-50 text-[#ff2056] font-serif font-black text-sm sm:text-xl flex items-center justify-center border border-rose-100 shadow-xs shrink-0">
                 {b.name.charAt(0)}
               </div>
-              <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-zinc-100 text-zinc-700">
+              <span className="px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[9px] sm:text-[10px] font-bold bg-zinc-100 text-zinc-700 truncate max-w-[85px] sm:max-w-none">
                 {b.badge}
               </span>
             </div>
 
-            <div className="mt-4">
-              <h3 className="font-bold text-base text-zinc-900">{b.name}</h3>
-              <p className="text-xs text-zinc-500 mt-0.5">Origin: {b.origin}</p>
+            <div className="mt-2.5 sm:mt-4">
+              <h3 className="font-bold text-xs sm:text-base text-zinc-900 truncate">{b.name}</h3>
+              <p className="text-[10px] sm:text-xs text-zinc-500 mt-0.5 truncate">Origin: {b.origin}</p>
             </div>
 
-            <div className="mt-5 pt-3 border-t border-zinc-100 flex items-center justify-between text-xs">
-              <span className="font-semibold text-zinc-600">
-                {b.productsCount} Products Listed
+            <div className="mt-3 sm:mt-5 pt-2 sm:pt-3 border-t border-zinc-100 flex items-center justify-between text-[10px] sm:text-xs">
+              <span className="font-semibold text-zinc-600 truncate">
+                {b.productsCount} Products
               </span>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2 shrink-0">
                 <button
                   onClick={() => handleDelete(b.id, b.name)}
-                  className="p-1.5 text-zinc-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                  className="p-1 sm:p-1.5 text-zinc-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                   title="Remove Brand"
                 >
-                  <FiTrash2 size={14} />
+                  <FiTrash2 size={13} />
                 </button>
               </div>
             </div>

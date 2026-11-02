@@ -22,6 +22,7 @@ import {
   FiArrowRight,
 } from "react-icons/fi";
 import { signOut } from "@/lib/auth-client";
+import { PRODUCTS } from "@/data/products";
 import toast from "react-hot-toast";
 
 export default function Header() {
@@ -34,6 +35,7 @@ export default function Header() {
     setIsTrackOrderOpen,
     role,
     setRole,
+    products,
   } = useShop();
 
   const pathname = usePathname();
@@ -43,6 +45,29 @@ export default function Header() {
   const [searchPanelOpen, setSearchPanelOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const catalog = products && products.length > 0 ? products : PRODUCTS;
+  const searchResults = searchQuery.trim()
+    ? catalog.filter((p) => {
+        const q = searchQuery.toLowerCase().trim();
+        const words = q.split(/\s+/).filter(Boolean);
+        const textToSearch = [
+          p.name,
+          p.category,
+          p.fabric,
+          p.description,
+          p.id,
+          p.tag,
+          ...(p.sizes || []),
+          ...(p.colors?.map((c: any) => (typeof c === "string" ? c : c.name)) || []),
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+
+        return textToSearch.includes(q) || words.every((word) => textToSearch.includes(word));
+      })
+    : [];
 
   const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<{ name?: string; email?: string } | null>(null);
@@ -100,7 +125,7 @@ export default function Header() {
       localStorage.removeItem("better_auth_token");
       try {
         await signOut();
-      } catch {}
+      } catch { }
       setRole("guest", true);
       setCurrentUser(null);
       setAccountDropdownOpen(false);
@@ -179,24 +204,24 @@ export default function Header() {
         className={`sticky top-0 z-40 w-full transition-all duration-200 bg-white ${isScrolled ? "shadow-md py-2.5 border-b border-zinc-200" : "py-3 border-b border-zinc-200"
           }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-2.5 sm:px-6 flex items-center justify-between gap-1.5 sm:gap-4">
           {/* Mobile Menu Icon */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 text-zinc-800 hover:text-[#4F213B] rounded-lg transition-colors cursor-pointer"
+            className="lg:hidden p-1.5 sm:p-2 text-zinc-800 hover:text-[#4F213B] rounded-lg transition-colors cursor-pointer shrink-0"
             aria-label="Open mobile navigation menu"
           >
-            {mobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+            {mobileMenuOpen ? <FiX size={22} className="sm:w-6 sm:h-6" /> : <FiMenu size={22} className="sm:w-6 sm:h-6" />}
           </button>
 
           {/* Logo (Same to same live site logo image) */}
-          <Link href="/" className="flex items-center">
-            <div className="relative h-10 w-44 sm:h-12 sm:w-52">
+          <Link href="/" className="flex items-center shrink-0">
+            <div className="relative h-8 w-32 sm:h-12 sm:w-52">
               <Image
                 src="https://borkashop.borbila.net/wp-content/uploads/2026/07/logo-1.png"
                 alt="Borka Shop Logo"
                 fill
-                sizes="(max-width: 640px) 176px, 208px"
+                sizes="(max-width: 640px) 128px, 208px"
                 priority
                 className="object-contain object-left"
               />
@@ -212,16 +237,16 @@ export default function Header() {
                   key={link.href}
                   href={link.href}
                   className={`py-1.5 transition-colors relative group cursor-pointer ${isActive
-                      ? "text-[#4F213B] font-semibold"
-                      : "text-zinc-800 hover:text-[#4F213B]"
+                    ? "text-[#4F213B] font-semibold"
+                    : "text-zinc-800 hover:text-[#4F213B]"
                     }`}
                 >
                   <span>{link.name}</span>
                   {/* Bottom Border on Hover & Active */}
                   <span
                     className={`absolute -bottom-1 left-0 h-[2.5px] bg-[#4F213B] rounded-full transition-all duration-300 ease-out ${isActive
-                        ? "w-full opacity-100"
-                        : "w-0 opacity-0 group-hover:w-full group-hover:opacity-100"
+                      ? "w-full opacity-100"
+                      : "w-0 opacity-0 group-hover:w-full group-hover:opacity-100"
                       }`}
                   />
                 </Link>
@@ -230,14 +255,19 @@ export default function Header() {
           </nav>
 
           {/* Right Action Icons */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Search Button (Toggle Slide-down Search Bar) */}
+          <div className="flex items-center gap-1 sm:gap-3 shrink-0">
+            {/* Search Button (Toggles Previous Navbar Slide-Down Search Bar) */}
             <button
-              onClick={() => setSearchPanelOpen(!searchPanelOpen)}
-              className="p-2 text-zinc-800 hover:text-[#4F213B] transition-colors rounded-full hover:bg-zinc-100"
+              onClick={() => {
+                setSearchPanelOpen(!searchPanelOpen);
+                if (!searchPanelOpen) {
+                  setTimeout(() => searchInputRef.current?.focus(), 100);
+                }
+              }}
+              className="p-1.5 sm:p-2 text-zinc-800 hover:text-[#4F213B] transition-colors rounded-full hover:bg-zinc-100 cursor-pointer"
               aria-label="Toggle Search"
             >
-              <FiSearch size={21} />
+              <FiSearch size={20} className="sm:w-[21px] sm:h-[21px]" />
             </button>
 
             {/* Account Icon with Dynamic Dropdown */}
@@ -247,20 +277,19 @@ export default function Header() {
                 onClick={() => {
                   setAccountDropdownOpen(!accountDropdownOpen);
                 }}
-                className={`p-2 transition-all rounded-full relative cursor-pointer ${
-                  accountDropdownOpen
+                className={`p-1.5 sm:p-2 transition-all rounded-full relative cursor-pointer ${accountDropdownOpen
                     ? "bg-[#4F213B]/10 text-[#4F213B]"
                     : "text-zinc-800 hover:text-[#4F213B] hover:bg-zinc-100"
-                }`}
+                  }`}
                 aria-label="User Account Menu"
                 aria-expanded={accountDropdownOpen}
               >
-                <FiUser size={21} />
+                <FiUser size={20} className="sm:w-[21px] sm:h-[21px]" />
                 {role === "admin" && (
-                  <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white ring-1 ring-emerald-500/20" />
+                  <span className="absolute top-1 right-1 sm:top-1.5 sm:right-1.5 w-2 sm:w-2.5 h-2 sm:h-2.5 bg-emerald-500 rounded-full border-2 border-white ring-1 ring-emerald-500/20" />
                 )}
                 {role === "user" && (
-                  <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-[#4F213B] rounded-full border-2 border-white ring-1 ring-[#4F213B]/20" />
+                  <span className="absolute top-1 right-1 sm:top-1.5 sm:right-1.5 w-2 sm:w-2.5 h-2 sm:h-2.5 bg-[#4F213B] rounded-full border-2 border-white ring-1 ring-[#4F213B]/20" />
                 )}
               </button>
 
@@ -458,19 +487,19 @@ export default function Header() {
             {/* Cart Button */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="p-2 text-zinc-800 hover:text-[#4F213B] transition-colors rounded-full hover:bg-zinc-100 relative"
+              className="p-1.5 sm:p-2 text-zinc-800 hover:text-[#4F213B] transition-colors rounded-full hover:bg-zinc-100 relative cursor-pointer"
               aria-label="View Cart"
             >
               <div className="relative">
                 {/* Shopping Basket SVG */}
                 <svg
-                  className="w-6 h-6 text-zinc-800 fill-current"
+                  className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-800 fill-current"
                   viewBox="0 0 1000 1000"
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path d="M104 365C104 365 105 365 105 365H208L279 168C288 137 320 115 355 115H646C681 115 713 137 723 170L793 365H896C896 365 897 365 897 365H958C975 365 990 379 990 396S975 427 958 427H923L862 801C848 851 803 885 752 885H249C198 885 152 851 138 798L78 427H42C25 427 10 413 10 396S25 365 42 365H104ZM141 427L199 785C205 807 225 823 249 823H752C775 823 796 807 801 788L860 427H141ZM726 365L663 189C660 182 654 177 645 177H355C346 177 340 182 338 187L274 365H726ZM469 521C469 504 483 490 500 490S531 504 531 521V729C531 746 517 760 500 760S469 746 469 729V521ZM677 734C674 751 658 762 641 760 624 758 613 742 615 725L644 519C647 502 663 490 680 492S708 510 706 527L677 734ZM385 725C388 742 375 757 358 760 341 762 325 750 323 733L293 527C291 510 303 494 320 492 337 489 353 501 355 518L385 725Z" />
                 </svg>
-                <span className="absolute -top-1.5 -right-2 bg-[#4F213B] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1.5 bg-[#4F213B] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                   {cartCount}
                 </span>
               </div>
@@ -480,55 +509,119 @@ export default function Header() {
 
         {/* 3. Dropdown Search Panel (Matches .bs-search-panel on borkashop.borbila.net) */}
         {searchPanelOpen && (
-          <div className="w-full bg-[#FAF8F6] border-t border-b border-zinc-200 py-3.5 px-4 animate-in slide-in-from-top-2 duration-150">
-            <div className="max-w-3xl mx-auto flex items-center gap-2">
-              <div className="relative flex-1">
-                <input
-                  ref={searchInputRef}
-                  type="search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search for Products..."
-                  className="w-full pl-10 pr-4 py-2.5 rounded-md border border-zinc-300 bg-white text-sm focus:outline-none focus:border-[#4F213B] focus:ring-1 focus:ring-[#4F213B]"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      setIsSearchOpen(true);
+          <div className="w-full bg-[#FAF8F6] border-t border-b border-zinc-200 py-3 sm:py-3.5 px-3 sm:px-4 animate-in slide-in-from-top-2 duration-150 relative z-50">
+            <div className="max-w-3xl mx-auto">
+              <div className="flex items-center gap-2">
+                <div className="relative flex-1">
+                  <input
+                    ref={searchInputRef}
+                    type="search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search for Products..."
+                    className="w-full pl-9 sm:pl-10 pr-4 py-2 sm:py-2.5 rounded-lg sm:rounded-md border border-zinc-300 bg-white text-xs sm:text-sm focus:outline-none focus:border-[#4F213B] focus:ring-1 focus:ring-[#4F213B]"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && searchQuery.trim()) {
+                        router.push(`/shop?q=${encodeURIComponent(searchQuery.trim())}`);
+                        setSearchPanelOpen(false);
+                      }
+                    }}
+                  />
+                  <FiSearch className="absolute left-3 top-2.5 sm:top-3 text-zinc-400" size={16} />
+                </div>
+                <button
+                  onClick={() => {
+                    if (searchQuery.trim()) {
+                      router.push(`/shop?q=${encodeURIComponent(searchQuery.trim())}`);
                       setSearchPanelOpen(false);
                     }
                   }}
-                />
-                <FiSearch className="absolute left-3.5 top-3 text-zinc-400" size={17} />
+                  className="bg-[#4F213B] hover:bg-[#3D182D] text-white px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-md text-xs sm:text-sm font-semibold transition-colors cursor-pointer shrink-0"
+                >
+                  Search
+                </button>
+                <button
+                  onClick={() => {
+                    setSearchPanelOpen(false);
+                    setSearchQuery("");
+                  }}
+                  className="p-1.5 sm:p-2 text-zinc-500 hover:text-zinc-800 cursor-pointer shrink-0"
+                  aria-label="Close search"
+                >
+                  <FiX size={19} />
+                </button>
               </div>
-              <button
-                onClick={() => {
-                  setIsSearchOpen(true);
-                  setSearchPanelOpen(false);
-                }}
-                className="bg-[#4F213B] hover:bg-[#3D182D] text-white px-5 py-2.5 rounded-md text-sm font-semibold transition-colors"
-              >
-                Search
-              </button>
-              <button
-                onClick={() => setSearchPanelOpen(false)}
-                className="p-2 text-zinc-500 hover:text-zinc-800"
-                aria-label="Close search"
-              >
-                <FiX size={20} />
-              </button>
+
+              {/* Real-time Universal Filter Results Dropdown */}
+              {searchQuery.trim() !== "" && (
+                <div className="mt-2 bg-white rounded-xl border border-zinc-200 shadow-xl overflow-hidden max-h-80 overflow-y-auto animate-in fade-in duration-150">
+                  {searchResults.length === 0 ? (
+                    <div className="p-4 text-center text-xs text-zinc-500">
+                      No matching products found for &quot;<span className="font-semibold text-zinc-800">{searchQuery}</span>&quot;
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="px-3 py-1.5 bg-zinc-50 border-b border-zinc-100 flex items-center justify-between text-[11px] font-bold text-zinc-500">
+                        <span>Matching Products ({searchResults.length})</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            router.push(`/shop?q=${encodeURIComponent(searchQuery.trim())}`);
+                            setSearchPanelOpen(false);
+                          }}
+                          className="text-[#4F213B] hover:underline cursor-pointer font-semibold text-[11px]"
+                        >
+                          View in Shop →
+                        </button>
+                      </div>
+                      <div className="divide-y divide-zinc-100">
+                        {searchResults.slice(0, 8).map((product) => (
+                          <div
+                            key={product.id}
+                            onClick={() => {
+                              router.push(`/shop?q=${encodeURIComponent(product.name)}`);
+                              setSearchPanelOpen(false);
+                              setSearchQuery("");
+                            }}
+                            className="p-2.5 hover:bg-[#FAF5F8] transition-colors flex items-center justify-between gap-3 cursor-pointer group"
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <div className="relative w-10 h-12 rounded-md overflow-hidden bg-zinc-100 shrink-0 border border-zinc-200">
+                                <Image
+                                  src={product.image}
+                                  alt={product.name}
+                                  fill
+                                  className="object-cover"
+                                  sizes="40px"
+                                />
+                              </div>
+                              <div className="min-w-0">
+                                <p className="font-semibold text-xs text-zinc-900 group-hover:text-[#4F213B] truncate">
+                                  {product.name}
+                                </p>
+                                <p className="text-[10px] text-zinc-400 truncate">
+                                  {product.category} {product.fabric ? `• ${product.fabric}` : ""}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="text-right shrink-0">
+                              <span className="font-bold text-xs text-[#4F213B] block">
+                                ৳{product.price.toLocaleString()}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )}
 
-        {/* Mobile Full-width Search Bar (always visible on mobile header on the live site) */}
-        <div className="lg:hidden px-4 pt-2.5 pb-1">
-          <div
-            onClick={() => setIsSearchOpen(true)}
-            className="flex items-center gap-2.5 w-full bg-zinc-100/90 rounded-md px-3 py-2 text-xs text-zinc-500 cursor-pointer border border-zinc-200"
-          >
-            <FiSearch className="text-zinc-400" size={16} />
-            <span>Search Products...</span>
-          </div>
-        </div>
+
 
         {/* Mobile Slide-in Drawer */}
         {mobileMenuOpen && (
@@ -551,8 +644,8 @@ export default function Header() {
                     href={link.href}
                     onClick={() => setMobileMenuOpen(false)}
                     className={`py-2 px-2.5 rounded-sm transition-colors flex items-center justify-between border-b cursor-pointer ${isActive
-                        ? "text-[#4F213B] font-bold bg-[#4F213B]/5 border-b-2 border-b-[#4F213B]"
-                        : "text-zinc-800 border-zinc-100 hover:text-[#4F213B] hover:border-b-[#4F213B]/40 hover:bg-zinc-50"
+                      ? "text-[#4F213B] font-bold bg-[#4F213B]/5 border-b-2 border-b-[#4F213B]"
+                      : "text-zinc-800 border-zinc-100 hover:text-[#4F213B] hover:border-b-[#4F213B]/40 hover:bg-zinc-50"
                       }`}
                   >
                     <span>{link.name}</span>

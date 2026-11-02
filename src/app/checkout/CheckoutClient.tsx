@@ -20,7 +20,7 @@ import { FaWhatsapp } from "react-icons/fa";
 import toast from "react-hot-toast";
 
 export default function CheckoutClient() {
-  const { cart, removeFromCart, updateQuantity, clearCart, placeOrder, addToCart } = useShop();
+  const { cart, removeFromCart, updateQuantity, clearCart, placeOrder, addToCart, syncCheckoutInfo } = useShop();
 
   // Form states
   const [fullName, setFullName] = useState("");
@@ -37,27 +37,22 @@ export default function CheckoutClient() {
     phone: string;
   } | null>(null);
 
-  // If cart is empty on first load, seed with demo product matching user's reference screenshot
+  // Sync draft checkout info to 'my-collection' in real-time
   useEffect(() => {
-    if (cart.length === 0) {
-      const sampleProduct = PRODUCTS[0] || {
-        id: "prod-demo",
-        name: "Luxury Korean Georgette Burqa",
-        slug: "luxury-korean-georgette-burqa",
-        category: "burqa",
-        price: 4270,
-        rating: 4.9,
-        reviewsCount: 88,
-        image: "https://borkashop.borbila.net/wp-content/uploads/2026/08/classic-everyday-black-burqa.png",
-        inStock: true,
-        sizes: ["S", "M", "L", "XL", "XXL"],
-        colors: [{ name: "Mocha", hex: "#8A6D58" }],
-        fabric: "Premium Korean Zoom Georgette",
-        description: "Luxury Korean Georgette Burqa",
-      };
-      addToCart(sampleProduct, "L", "Mocha", 1);
+    if (fullName || phoneNumber || fullAddress) {
+      const timer = setTimeout(() => {
+        syncCheckoutInfo({
+          fullName,
+          phone: phoneNumber,
+          address: fullAddress,
+          deliveryArea,
+          couponCode,
+          appliedDiscount,
+        });
+      }, 600);
+      return () => clearTimeout(timer);
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [fullName, phoneNumber, fullAddress, deliveryArea, couponCode, appliedDiscount]);
 
   // Calculations
   const subtotal = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
@@ -400,8 +395,8 @@ export default function CheckoutClient() {
             </div>
 
             <div className="p-4 sm:p-5 space-y-4">
-              {/* Product Table Header */}
-              <div className="bg-[#F8F8F8] rounded-lg border border-zinc-200/60 grid grid-cols-12 py-2 px-2 text-[11px] sm:text-xs font-bold text-zinc-800 text-center">
+              {/* Product Table Header (Desktop Only) */}
+              <div className="hidden sm:grid bg-[#F8F8F8] rounded-lg border border-zinc-200/60 grid-cols-12 py-2 px-2 text-[11px] sm:text-xs font-bold text-zinc-800 text-center">
                 <span className="col-span-2">Delete</span>
                 <span className="col-span-5 text-left pl-2">Product</span>
                 <span className="col-span-3">Quantity</span>
@@ -416,66 +411,136 @@ export default function CheckoutClient() {
                   </div>
                 ) : (
                   cart.map((item) => (
-                    <div key={item.id} className="grid grid-cols-12 items-center py-3 px-1 text-xs sm:text-sm">
-                      {/* Delete Icon */}
-                      <div className="col-span-2 flex justify-center">
-                        <button
-                          type="button"
-                          onClick={() => removeFromCart(item.id)}
-                          className="text-red-500 hover:text-red-700 p-1.5 transition-colors cursor-pointer"
-                          title="Delete item"
-                        >
-                          <FiTrash2 size={16} />
-                        </button>
+                    <div key={item.id}>
+                      {/* Mobile View: Spacious & Clean (Zero cramping) */}
+                      <div className="sm:hidden py-3 px-1 space-y-2.5">
+                        <div className="flex items-start gap-3">
+                          {/* Product Thumbnail */}
+                          <div className="relative w-14 h-16 rounded-lg overflow-hidden bg-zinc-100 shrink-0 border border-zinc-200">
+                            <Image
+                              src={item.product.image}
+                              alt={item.product.name}
+                              fill
+                              className="object-cover"
+                              sizes="56px"
+                            />
+                          </div>
+
+                          {/* Product Details */}
+                          <div className="flex-1 min-w-0 pr-1">
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="font-semibold text-xs text-zinc-900 leading-snug">
+                                {item.product.name}
+                              </p>
+                              {/* Delete Button */}
+                              <button
+                                type="button"
+                                onClick={() => removeFromCart(item.id)}
+                                className="text-red-500 hover:text-red-700 p-1 -mt-1 -mr-1 transition-colors cursor-pointer shrink-0"
+                                title="Delete item"
+                              >
+                                <FiTrash2 size={15} />
+                              </button>
+                            </div>
+
+                            <p className="text-[11px] text-zinc-500 mt-1">
+                              Size: <span className="font-bold text-zinc-700">{item.size}</span> • Color: <span className="font-bold text-zinc-700">{item.color}</span>
+                            </p>
+
+                            {/* Quantity & Price Row with plenty of space */}
+                            <div className="flex items-center justify-between pt-2 mt-1 border-t border-zinc-50">
+                              {/* Quantity Stepper */}
+                              <div className="flex items-center border border-zinc-300 rounded-lg bg-white shadow-2xs">
+                                <button
+                                  type="button"
+                                  onClick={() => updateQuantity(item.id, -1)}
+                                  className="px-2.5 py-1 text-zinc-600 hover:bg-zinc-100 transition-colors cursor-pointer"
+                                >
+                                  <FiMinus size={11} />
+                                </button>
+                                <span className="px-3 font-bold text-xs text-zinc-800">
+                                  {item.quantity}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => updateQuantity(item.id, 1)}
+                                  className="px-2.5 py-1 text-zinc-600 hover:bg-zinc-100 transition-colors cursor-pointer"
+                                >
+                                  <FiPlus size={11} />
+                                </button>
+                              </div>
+
+                              {/* Total Price */}
+                              <div className="text-right font-bold text-sm text-[#ff2056]">
+                                {(item.product.price * item.quantity).toLocaleString()}৳
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
 
-                      {/* Product Thumbnail & Name */}
-                      <div className="col-span-5 flex items-center gap-2 pl-1 min-w-0">
-                        <div className="relative w-10 h-12 sm:w-12 sm:h-14 rounded-md overflow-hidden bg-zinc-100 shrink-0 border border-zinc-200">
-                          <Image
-                            src={item.product.image}
-                            alt={item.product.name}
-                            fill
-                            className="object-cover"
-                            sizes="48px"
-                          />
-                        </div>
-                        <div className="min-w-0 pr-1">
-                          <p className="font-semibold text-xs text-zinc-900 truncate">
-                            {item.product.name}
-                          </p>
-                          <p className="text-[11px] text-zinc-500 truncate">
-                            - {item.size}, {item.color}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Quantity Stepper */}
-                      <div className="col-span-3 flex justify-center">
-                        <div className="flex items-center border border-zinc-300 rounded-md bg-white">
+                      {/* Desktop & Tablet View (100% Unchanged) */}
+                      <div className="hidden sm:grid grid-cols-12 items-center py-3 px-1 text-xs sm:text-sm">
+                        {/* Delete Icon */}
+                        <div className="col-span-2 flex justify-center">
                           <button
                             type="button"
-                            onClick={() => updateQuantity(item.id, -1)}
-                            className="px-2 py-0.5 text-zinc-600 hover:bg-zinc-100 transition-colors cursor-pointer"
+                            onClick={() => removeFromCart(item.id)}
+                            className="text-red-500 hover:text-red-700 p-1.5 transition-colors cursor-pointer"
+                            title="Delete item"
                           >
-                            <FiMinus size={11} />
-                          </button>
-                          <span className="px-2 font-bold text-xs text-zinc-800">
-                            {item.quantity}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => updateQuantity(item.id, 1)}
-                            className="px-2 py-0.5 text-zinc-600 hover:bg-zinc-100 transition-colors cursor-pointer"
-                          >
-                            <FiPlus size={11} />
+                            <FiTrash2 size={16} />
                           </button>
                         </div>
-                      </div>
 
-                      {/* Price */}
-                      <div className="col-span-2 text-right pr-2 font-bold text-zinc-900 text-xs sm:text-sm">
-                        {(item.product.price * item.quantity).toLocaleString()}৳
+                        {/* Product Thumbnail & Name */}
+                        <div className="col-span-5 flex items-center gap-2 pl-1 min-w-0">
+                          <div className="relative w-10 h-12 sm:w-12 sm:h-14 rounded-md overflow-hidden bg-zinc-100 shrink-0 border border-zinc-200">
+                            <Image
+                              src={item.product.image}
+                              alt={item.product.name}
+                              fill
+                              className="object-cover"
+                              sizes="48px"
+                            />
+                          </div>
+                          <div className="min-w-0 pr-1">
+                            <p className="font-semibold text-xs text-zinc-900 truncate">
+                              {item.product.name}
+                            </p>
+                            <p className="text-[11px] text-zinc-500 truncate">
+                              - {item.size}, {item.color}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Quantity Stepper */}
+                        <div className="col-span-3 flex justify-center">
+                          <div className="flex items-center border border-zinc-300 rounded-md bg-white">
+                            <button
+                              type="button"
+                              onClick={() => updateQuantity(item.id, -1)}
+                              className="px-2 py-0.5 text-zinc-600 hover:bg-zinc-100 transition-colors cursor-pointer"
+                            >
+                              <FiMinus size={11} />
+                            </button>
+                            <span className="px-2 font-bold text-xs text-zinc-800">
+                              {item.quantity}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => updateQuantity(item.id, 1)}
+                              className="px-2 py-0.5 text-zinc-600 hover:bg-zinc-100 transition-colors cursor-pointer"
+                            >
+                              <FiPlus size={11} />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Price */}
+                        <div className="col-span-2 text-right pr-2 font-bold text-zinc-900 text-xs sm:text-sm">
+                          {(item.product.price * item.quantity).toLocaleString()}৳
+                        </div>
                       </div>
                     </div>
                   ))

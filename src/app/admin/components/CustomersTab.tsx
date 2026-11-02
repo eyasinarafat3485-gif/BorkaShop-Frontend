@@ -149,8 +149,88 @@ export default function CustomersTab() {
             <p className="text-sm font-bold text-zinc-700">No customers found</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+          <>
+            {/* Mobile Card View (Zero Horizontal Scroll) */}
+            <div className="sm:hidden divide-y divide-zinc-100">
+              {filteredCustomers.map((c) => {
+                const cleanPhone = c.phone.replace(/[^0-9]/g, "");
+                const whatsappUrl = `https://wa.me/88${cleanPhone}`;
+
+                return (
+                  <div key={c.id} className="p-3.5 space-y-2.5 hover:bg-zinc-50/60 transition-colors">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-purple-50 text-[#ff2056] font-bold text-xs flex items-center justify-center shrink-0 border border-purple-100">
+                          {c.name.slice(0, 2).toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="font-bold text-zinc-900 text-xs">{c.name}</p>
+                          <p className="text-[10px] text-zinc-400 font-mono">{c.id}</p>
+                        </div>
+                      </div>
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          c.role === "Registered Member"
+                            ? "bg-purple-50 text-[#ff2056] border border-purple-200"
+                            : "bg-zinc-100 text-zinc-600"
+                        }`}
+                      >
+                        {c.role}
+                      </span>
+                    </div>
+
+                    <div className="text-xs space-y-0.5">
+                      <p className="text-zinc-600 font-mono text-[11px]">{c.phone}</p>
+                      <p className="text-zinc-400 text-[10px] truncate">{c.email}</p>
+                      {c.address && (
+                        <p className="text-zinc-500 text-[11px] line-clamp-1">{c.address}</p>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between pt-1 border-t border-zinc-100">
+                      <div className="text-xs">
+                        <span className="font-bold text-[#ff2056]">৳{c.totalSpent.toLocaleString()}</span>
+                        <span className="text-zinc-400 text-[10px] ml-1.5">({c.totalOrders} orders)</span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5">
+                        <a
+                          href={`tel:${c.phone}`}
+                          className="p-1.5 rounded-lg bg-zinc-100 text-zinc-700 hover:text-[#ff2056]"
+                          title="Call customer"
+                        >
+                          <FiPhone size={13} />
+                        </a>
+                        <a
+                          href={whatsappUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:text-emerald-700"
+                          title="Chat on WhatsApp"
+                        >
+                          <FaWhatsapp size={14} />
+                        </a>
+                        <button
+                          onClick={() => {
+                            if (confirm(`Are you sure you want to remove customer "${c.name}" from database?`)) {
+                              deleteCustomer(c.id);
+                            }
+                          }}
+                          className="p-1.5 rounded-lg bg-rose-50 text-rose-600 hover:text-rose-700 cursor-pointer"
+                          title="Delete customer"
+                        >
+                          <FiTrash2 size={13} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop & Tablet Table (Preserved) */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-left text-xs">
               <thead className="bg-zinc-50 text-zinc-500 uppercase tracking-wider font-bold border-b border-zinc-200">
                 <tr>
                   <th className="py-3 px-4">Customer</th>
@@ -253,7 +333,8 @@ export default function CustomersTab() {
                 })}
               </tbody>
             </table>
-          </div>
+            </div>
+          </>
         )}
       </div>
     </div>

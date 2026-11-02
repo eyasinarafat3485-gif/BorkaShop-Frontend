@@ -80,22 +80,22 @@ export default function CategoriesTab() {
   return (
     <div className="space-y-6">
       {/* 1. Header */}
-      <div className="bg-white rounded-2xl border border-zinc-200/90 p-5 shadow-xs flex items-center justify-between">
+      <div className="bg-white rounded-2xl border border-zinc-200/90 p-3.5 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h2 className="text-xl font-bold text-zinc-900 font-serif">
+          <h2 className="text-base sm:text-xl font-bold text-zinc-900 font-serif">
             Categories Management
           </h2>
-          <p className="text-xs text-zinc-500 mt-0.5">
+          <p className="text-[11px] sm:text-xs text-zinc-500 mt-0.5">
             Organize catalog groupings, product counts, and collections
           </p>
         </div>
 
         <button
           onClick={() => setIsAdding(!isAdding)}
-          className="py-2 px-4 bg-[#ff2056] hover:bg-[#3D182D] text-white text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-xs"
+          className="py-1.5 px-3 sm:py-2 sm:px-4 bg-[#ff2056] hover:bg-[#3D182D] text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs whitespace-nowrap self-start sm:self-auto"
         >
-          <FiPlus size={15} />
-          <span>+ Add Category</span>
+          <FiPlus size={14} />
+          <span>Add Category</span>
         </button>
       </div>
 
@@ -150,41 +150,41 @@ export default function CategoriesTab() {
       )}
 
       {/* 2. Category Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-5">
         {categories.map((cat) => {
           const productCount = products.filter((p) => p.category === cat.slug).length;
 
           return (
             <div
               key={cat.id}
-              className="bg-white rounded-2xl border border-zinc-200/90 overflow-hidden shadow-xs hover:shadow-md hover:border-[#ff2056]/40 transition-all flex flex-col justify-between"
+              className="bg-white rounded-xl sm:rounded-2xl border border-zinc-200/90 overflow-hidden shadow-xs hover:shadow-md hover:border-[#ff2056]/40 transition-all flex flex-col justify-between"
             >
-              <div className="relative h-36 bg-zinc-100 overflow-hidden">
+              <div className="relative h-24 sm:h-36 bg-zinc-100 overflow-hidden">
                 <img
                   src={cat.image}
                   alt={cat.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-4">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex items-end p-2.5 sm:p-4">
                   <div>
-                    <h3 className="font-serif font-black text-white text-lg tracking-wide uppercase">
+                    <h3 className="font-serif font-black text-white text-xs sm:text-lg tracking-wide uppercase line-clamp-1">
                       {cat.name}
                     </h3>
-                    <span className="text-[10px] text-amber-200 font-bold">
-                      {productCount} Products Active
+                    <span className="text-[9px] sm:text-[10px] text-amber-200 font-bold block">
+                      {productCount} Products
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
-                <p className="text-xs text-zinc-600 line-clamp-2 leading-relaxed">
+              <div className="p-2.5 sm:p-4 space-y-2 sm:space-y-3 flex-1 flex flex-col justify-between">
+                <p className="text-[11px] sm:text-xs text-zinc-600 line-clamp-2 leading-snug sm:leading-relaxed">
                   {cat.description}
                 </p>
 
-                <div className="pt-2 border-t border-zinc-100 flex items-center justify-between text-[11px] text-zinc-500 font-mono">
-                  <span>Slug: /{cat.slug}</span>
-                  <span className="font-bold text-[#ff2056] font-sans">Active</span>
+                <div className="pt-2 border-t border-zinc-100 flex items-center justify-between text-[10px] sm:text-[11px] text-zinc-500 font-mono">
+                  <span className="truncate">/{cat.slug}</span>
+                  <span className="font-bold text-[#ff2056] font-sans shrink-0">Active</span>
                 </div>
               </div>
             </div>

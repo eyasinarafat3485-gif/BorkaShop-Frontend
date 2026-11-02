@@ -88,7 +88,7 @@ export default function NotificationsTab() {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200/80 p-6 sm:p-8 shadow-xs space-y-6">
+    <div className="bg-white rounded-2xl border border-gray-200/80 p-3.5 sm:p-8 shadow-xs space-y-4 sm:space-y-6">
       {/* 1. Header with Title, Unread Count & Mark All Read */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-gray-100">
         <div>
@@ -178,7 +178,7 @@ export default function NotificationsTab() {
               <div
                 key={notifId}
                 onClick={() => handleItemClick(item)}
-                className={`p-4 rounded-2xl border transition-all flex items-start gap-4 cursor-pointer relative group ${
+                className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl border transition-all flex items-start gap-2.5 sm:gap-4 cursor-pointer relative group ${
                   isUnread
                     ? "bg-rose-50/40 border-rose-200/90 shadow-2xs hover:bg-rose-50/70"
                     : "bg-slate-50/50 border-gray-200/60 hover:bg-white hover:border-gray-300"
@@ -189,41 +189,96 @@ export default function NotificationsTab() {
                   <img
                     src={item.productImage}
                     alt={item.title}
-                    className="w-12 h-14 rounded-xl object-cover border border-gray-200 shrink-0 shadow-2xs"
+                    className="w-11 h-13 sm:w-12 sm:h-14 rounded-xl object-cover border border-gray-200 shrink-0 shadow-2xs"
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-900 to-slate-800 text-white flex items-center justify-center shrink-0 shadow-xs font-bold text-sm">
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-slate-900 to-slate-800 text-white flex items-center justify-center shrink-0 shadow-xs font-bold text-xs sm:text-sm">
                     {getNotificationIcon(item.type)}
                   </div>
                 )}
 
                 {/* Content */}
                 <div className="flex-1 space-y-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
-                    <h4
-                      className={`text-xs sm:text-sm leading-snug ${
-                        isUnread ? "font-bold text-slate-900" : "font-semibold text-slate-500"
-                      }`}
-                    >
-                      {item.title}
-                    </h4>
-                    <span className="text-[10px] text-gray-400 shrink-0 font-medium font-mono">
-                      {formatTimestamp(item.createdAt)}
-                    </span>
+                  <div className="flex items-start justify-between gap-1.5">
+                    <div className="min-w-0 flex-1">
+                      <h4
+                        className={`text-xs sm:text-sm leading-snug truncate ${
+                          isUnread ? "font-bold text-slate-900" : "font-semibold text-slate-500"
+                        }`}
+                      >
+                        {item.title}
+                      </h4>
+                      <span className="text-[10px] text-gray-400 font-mono block sm:hidden">
+                        {formatTimestamp(item.createdAt)}
+                      </span>
+                    </div>
+
+                    {/* Actions & Timestamp */}
+                    <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+                      <span className="hidden sm:inline text-[10px] text-gray-400 font-medium font-mono">
+                        {formatTimestamp(item.createdAt)}
+                      </span>
+
+                      {/* Mark as Read / Unread toggle */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (isUnread) {
+                            markNotificationAsRead(notifId);
+                          } else {
+                            markNotificationAsUnread(notifId);
+                          }
+                        }}
+                        className={`p-1 sm:p-1.5 rounded-lg transition-colors cursor-pointer text-xs flex items-center gap-1 ${
+                          isUnread
+                            ? "text-[#ff2056] hover:bg-rose-100"
+                            : "text-emerald-600 hover:text-slate-700 hover:bg-emerald-50"
+                        }`}
+                        title={isUnread ? "Click to mark as read" : "Read (Click to mark as unread)"}
+                      >
+                        {isUnread ? (
+                          <FiCheck size={15} />
+                        ) : (
+                          <FiCheckCircle size={15} className="text-emerald-500" />
+                        )}
+                      </button>
+
+                      {/* Delete / Dismiss */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteNotification(notifId);
+                        }}
+                        className="p-1 sm:p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                        title="Dismiss alert"
+                      >
+                        <FiTrash2 size={13} className="sm:w-3.5 sm:h-3.5" />
+                      </button>
+
+                      {/* Red pulsing dot for unread */}
+                      {isUnread && (
+                        <span
+                          className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#ff2056] shrink-0 shadow-xs animate-pulse"
+                          title="Unread notification"
+                        />
+                      )}
+                    </div>
                   </div>
 
                   <p
-                    className={`text-xs line-clamp-2 leading-relaxed ${
+                    className={`text-[11px] sm:text-xs line-clamp-2 leading-relaxed ${
                       isUnread ? "text-slate-700 font-medium" : "text-slate-400"
                     }`}
                   >
                     {item.message}
                   </p>
 
-                  <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px]">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 pt-0.5 text-[10px] sm:text-[11px]">
                     {item.price && item.price > 0 ? (
                       <span
-                        className={`font-extrabold px-2 py-0.5 rounded-md border text-[11px] ${
+                        className={`font-extrabold px-1.5 sm:px-2 py-0.5 rounded-md border text-[10px] sm:text-[11px] ${
                           isUnread
                             ? "text-[#ff2056] bg-rose-50 border-rose-100"
                             : "text-slate-500 bg-slate-100 border-gray-200"
@@ -234,64 +289,15 @@ export default function NotificationsTab() {
                     ) : null}
 
                     {item.orderId && (
-                      <span className="font-mono text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md text-[10px] font-semibold border border-slate-200/60">
+                      <span className="font-mono text-slate-700 bg-slate-100 px-1.5 sm:px-2 py-0.5 rounded-md text-[9.5px] sm:text-[10px] font-semibold border border-slate-200/60">
                         Order: #{item.orderId}
                       </span>
                     )}
 
-                    <span className="text-[10px] uppercase font-bold text-slate-400 px-1.5 py-0.5 rounded bg-slate-100/80">
+                    <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 px-1.5 py-0.5 rounded bg-slate-100/80">
                       {item.type}
                     </span>
                   </div>
-                </div>
-
-                {/* Right controls: unread indicator & quick actions */}
-                <div className="flex items-center gap-2 shrink-0">
-                  {/* Mark as Read / Unread toggle */}
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (isUnread) {
-                        markNotificationAsRead(notifId);
-                      } else {
-                        markNotificationAsUnread(notifId);
-                      }
-                    }}
-                    className={`p-1.5 rounded-lg transition-colors cursor-pointer text-xs flex items-center gap-1 ${
-                      isUnread
-                        ? "text-[#ff2056] hover:bg-rose-100"
-                        : "text-emerald-600 hover:text-slate-700 hover:bg-emerald-50"
-                    }`}
-                    title={isUnread ? "Click to mark as read" : "Read (Click to mark as unread)"}
-                  >
-                    {isUnread ? (
-                      <FiCheck size={16} />
-                    ) : (
-                      <FiCheckCircle size={16} className="text-emerald-500" />
-                    )}
-                  </button>
-
-                  {/* Delete / Dismiss */}
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteNotification(notifId);
-                    }}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-                    title="Dismiss alert"
-                  >
-                    <FiTrash2 size={14} />
-                  </button>
-
-                  {/* Red pulsing dot for unread */}
-                  {isUnread && (
-                    <span
-                      className="w-2.5 h-2.5 rounded-full bg-[#ff2056] shrink-0 shadow-xs animate-pulse"
-                      title="Unread notification"
-                    />
-                  )}
                 </div>
               </div>
             );

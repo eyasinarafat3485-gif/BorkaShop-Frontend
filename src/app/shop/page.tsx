@@ -1,22 +1,41 @@
 "use client";
 
-import React, { useState, useMemo, Suspense } from "react";
+import React, { useState, useMemo, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { PRODUCTS } from "@/data/products";
 import { useShop } from "@/context/ShopContext";
 import ProductCard from "@/components/ProductCard";
-import { FiChevronRight, FiFilter, FiSearch, FiSliders } from "react-icons/fi";
+import { FiChevronRight, FiFilter, FiSearch, FiSliders, FiX } from "react-icons/fi";
 
 function ShopContent() {
   const searchParams = useSearchParams();
   const { products } = useShop();
+  const qParam = searchParams.get("q") || searchParams.get("search") || "";
   const initialCategory = searchParams.get("category") || "all";
   const filterParam = searchParams.get("filter") || "";
 
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>(qParam);
   const [sortBy, setSortBy] = useState<"default" | "price-asc" | "price-desc" | "rating">("default");
+
+  // Keep state synchronized with URL search parameters
+  useEffect(() => {
+    if (qParam) {
+      setSearchQuery(qParam);
+      // When searching a specific product or keyword, include all categories so it's always found
+      setSelectedCategory("all");
+    } else {
+      setSearchQuery("");
+    }
+  }, [qParam]);
+
+  useEffect(() => {
+    const cat = searchParams.get("category");
+    if (cat) {
+      setSelectedCategory(cat);
+    }
+  }, [searchParams]);
 
   const categories = [
     { id: "all", label: "All Items" },
@@ -33,6 +52,28 @@ function ShopContent() {
     const catalog = products && products.length > 0 ? products : PRODUCTS;
     let result = [...catalog];
 
+    // Filter by search query (intelligent search across all fields)
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      const words = q.split(/\s+/).filter(Boolean);
+      result = result.filter((p) => {
+        const textToSearch = [
+          p.name,
+          p.category,
+          p.fabric || "",
+          p.description || "",
+          p.tag || "",
+          p.id || "",
+          ...(p.sizes || []),
+          ...(p.colors?.map((c) => (typeof c === "string" ? c : c.name)) || []),
+        ]
+          .join(" ")
+          .toLowerCase();
+
+        return textToSearch.includes(q) || words.every((word) => textToSearch.includes(word));
+      });
+    }
+
     // Filter by category
     if (selectedCategory !== "all") {
       result = result.filter((p) => p.category === selectedCategory);
@@ -45,17 +86,6 @@ function ShopContent() {
       result = result.filter((p) => p.isBestSeller);
     }
 
-    // Filter by search query
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.category.toLowerCase().includes(q) ||
-          p.fabric.toLowerCase().includes(q)
-      );
-    }
-
     // Sort
     if (sortBy === "price-asc") {
       result.sort((a, b) => a.price - b.price);
@@ -66,7 +96,7 @@ function ShopContent() {
     }
 
     return result;
-  }, [selectedCategory, filterParam, searchQuery, sortBy]);
+  }, [products, selectedCategory, filterParam, searchQuery, sortBy]);
 
   return (
     <div className="w-full bg-[#FAF9F8] min-h-screen pb-16">
@@ -97,7 +127,9 @@ function ShopContent() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h1 className="font-['Hind_Siliguri'] text-2xl sm:text-3xl font-bold text-zinc-900">
-                {selectedCategory === "all"
+                {searchQuery.trim()
+                  ? `Search Results for "${searchQuery}"`
+                  : selectedCategory === "all"
                   ? filterParam === "new-arrivals"
                     ? "New Arrivals Collection"
                     : filterParam === "best-sellers"
@@ -105,8 +137,21 @@ function ShopContent() {
                     : "Shop All Collections"
                   : `${selectedCategory.toUpperCase()} Collection`}
               </h1>
-              <p className="text-xs sm:text-sm text-zinc-500 mt-1">
-                Showing {filteredProducts.length} premium modest fashion products
+              <p className="text-xs sm:text-sm text-zinc-500 mt-1 flex items-center gap-2 flex-wrap">
+                <span>
+                  Showing {filteredProducts.length} {filteredProducts.length === 1 ? "product" : "products"}
+                </span>
+                {searchQuery.trim() && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery("");
+                      setSelectedCategory("all");
+                    }}
+                    className="text-[#4F213B] font-semibold hover:underline inline-flex items-center gap-1 cursor-pointer bg-[#4F213B]/5 px-2 py-0.5 rounded text-xs"
+                  >
+                    <FiX size={12} /> Clear search filter
+                  </button>
+                )}
               </p>
             </div>
 
@@ -117,9 +162,19 @@ function ShopContent() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search products in shop..."
-                className="w-full pl-9 pr-4 py-2 rounded-md border border-zinc-300 text-xs sm:text-sm bg-zinc-50 focus:bg-white focus:outline-none focus:border-[#4F213B] transition-colors"
+                className="w-full pl-9 pr-8 py-2 rounded-md border border-zinc-300 text-xs sm:text-sm bg-zinc-50 focus:bg-white focus:outline-none focus:border-[#4F213B] transition-colors"
               />
               <FiSearch className="absolute left-3 top-2.5 text-zinc-400" size={15} />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2.5 top-2.5 text-zinc-400 hover:text-zinc-600 cursor-pointer p-0.5"
+                  aria-label="Clear search"
+                >
+                  <FiX size={15} />
+                </button>
+              )}
             </div>
           </div>
 

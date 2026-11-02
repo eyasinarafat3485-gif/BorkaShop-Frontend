@@ -121,7 +121,7 @@ export default function OrdersTab({
         </div>
 
         {/* Status Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-1.5 sm:gap-2 sm:overflow-x-auto pb-1 text-xs">
           {statuses.map((st) => {
             const count = st === "All" ? orders.length : orders.filter((o) => o.status === st).length;
             const isActive = statusFilter === st;
@@ -129,7 +129,7 @@ export default function OrdersTab({
               <button
                 key={st}
                 onClick={() => setStatusFilter(st)}
-                className={`py-2 px-3.5 rounded-xl font-bold transition-all whitespace-nowrap cursor-pointer flex items-center gap-2 ${
+                className={`py-1.5 px-2.5 sm:py-2 sm:px-3.5 rounded-lg sm:rounded-xl font-bold transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs ${
                   isActive
                     ? "bg-[#ff2056] text-white shadow-md shadow-[#ff2056]/20"
                     : "bg-zinc-100/80 hover:bg-zinc-200/80 text-zinc-600"
@@ -137,7 +137,7 @@ export default function OrdersTab({
               >
                 <span>{st}</span>
                 <span
-                  className={`px-1.5 py-0.5 rounded-full text-[10px] ${
+                  className={`px-1.5 py-0.5 rounded-full text-[9.5px] sm:text-[10px] ${
                     isActive ? "bg-white/20 text-white" : "bg-zinc-200 text-zinc-700"
                   }`}
                 >
@@ -186,8 +186,131 @@ export default function OrdersTab({
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+          <>
+            {/* Mobile Card View (Zero Horizontal Scroll) */}
+            <div className="sm:hidden divide-y divide-zinc-100">
+              {filteredOrders.map((ord) => {
+                const cleanPhone = ord.phone.replace(/[^0-9]/g, "");
+                const whatsappUrl = `https://wa.me/88${cleanPhone}`;
+
+                return (
+                  <div key={ord.id} className="p-3.5 space-y-3 hover:bg-zinc-50/60 transition-colors">
+                    {/* Header: ID, Date, Role & Status */}
+                    <div className="flex items-center justify-between gap-2">
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono font-bold text-xs text-zinc-900">{ord.id}</span>
+                          <span
+                            className={`text-[9px] font-bold px-1.5 py-0.2 rounded capitalize ${
+                              ord.role === "user" ? "bg-purple-50 text-[#ff2056]" : "bg-zinc-100 text-zinc-600"
+                            }`}
+                          >
+                            {ord.role}
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-zinc-400 block">{ord.createdAt}</span>
+                      </div>
+
+                      <select
+                        value={ord.status}
+                        onChange={(e) => updateOrderStatus(ord.id, e.target.value as any)}
+                        className={`py-1 px-2 rounded-lg font-bold text-[11px] border focus:outline-none cursor-pointer ${
+                          ord.status === "Delivered"
+                            ? "bg-emerald-50 text-emerald-800 border-emerald-300"
+                            : ord.status === "Processing"
+                            ? "bg-blue-50 text-blue-800 border-blue-300"
+                            : ord.status === "Shipped"
+                            ? "bg-purple-50 text-purple-800 border-purple-300"
+                            : ord.status === "Cancelled"
+                            ? "bg-rose-50 text-rose-800 border-rose-300"
+                            : "bg-amber-50 text-amber-800 border-amber-300"
+                        }`}
+                      >
+                        <option value="Pending">Pending</option>
+                        <option value="Processing">Processing</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
+                      </select>
+                    </div>
+
+                    {/* Customer & Phone */}
+                    <div className="flex items-center justify-between text-xs">
+                      <div>
+                        <p className="font-bold text-zinc-900">{ord.customerName}</p>
+                        <p className="text-[11px] text-zinc-500 line-clamp-1">{ord.address}</p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <a
+                          href={`tel:${ord.phone}`}
+                          className="p-1.5 rounded-lg bg-zinc-100 text-zinc-700 hover:text-[#ff2056]"
+                          title="Call"
+                        >
+                          <FiPhone size={13} />
+                        </a>
+                        <a
+                          href={whatsappUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:text-emerald-700"
+                          title="WhatsApp"
+                        >
+                          <FaWhatsapp size={14} />
+                        </a>
+                      </div>
+                    </div>
+
+                    {/* Items Preview */}
+                    <div className="bg-zinc-50/80 rounded-xl p-2 space-y-1.5">
+                      {ord.items.map((item, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <img
+                            src={item.productImage}
+                            alt={item.productName}
+                            className="w-7 h-7 rounded-md object-cover bg-zinc-100 shrink-0 border border-zinc-200"
+                          />
+                          <div className="text-[10px] leading-tight flex-1 min-w-0">
+                            <p className="font-semibold text-zinc-800 truncate">{item.productName}</p>
+                            <p className="text-zinc-500">
+                              {item.size} • {item.color} • Qty: {item.quantity}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Footer: Total & Actions */}
+                    <div className="flex items-center justify-between pt-1 border-t border-zinc-100">
+                      <div>
+                        <span className="font-bold text-[#ff2056] text-sm">৳{ord.total.toLocaleString()}</span>
+                        <span className="text-[10px] text-zinc-400 ml-1.5 font-bold uppercase">{ord.paymentMethod}</span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => onOpenOrderModal(ord.id)}
+                          className="p-1.5 rounded-lg bg-purple-50 hover:bg-[#ff2056] text-[#ff2056] hover:text-white transition-colors cursor-pointer"
+                          title="View Invoice"
+                        >
+                          <FiEye size={14} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(ord.id)}
+                          className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-500 text-rose-600 hover:text-white transition-colors cursor-pointer"
+                          title="Delete Order"
+                        >
+                          <FiTrash2 size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop & Tablet Table (Preserved) */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-left text-xs">
               <thead className="bg-zinc-50 text-zinc-500 uppercase tracking-wider font-bold border-b border-zinc-200">
                 <tr>
                   <th className="py-3 px-4">Order ID & Date</th>
@@ -347,7 +470,8 @@ export default function OrdersTab({
                 })}
               </tbody>
             </table>
-          </div>
+            </div>
+          </>
         )}
       </div>
     </div>

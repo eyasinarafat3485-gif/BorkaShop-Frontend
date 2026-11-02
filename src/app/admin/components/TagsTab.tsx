@@ -53,23 +53,23 @@ export default function TagsTab() {
   return (
     <div className="space-y-6">
       {/* 1. Header */}
-      <div className="bg-white rounded-2xl border border-zinc-200/90 p-5 shadow-xs flex items-center justify-between">
+      <div className="bg-white rounded-2xl border border-zinc-200/90 p-3.5 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h2 className="text-xl font-bold text-zinc-900 font-serif flex items-center gap-2">
+          <h2 className="text-base sm:text-xl font-bold text-zinc-900 font-serif flex items-center gap-2">
             <FiTag className="text-[#ff2056]" />
             <span>Product Tags & Badges</span>
           </h2>
-          <p className="text-xs text-zinc-500 mt-0.5">
+          <p className="text-[11px] sm:text-xs text-zinc-500 mt-0.5">
             Manage product badges, marketing labels, search filters, and campaign tags
           </p>
         </div>
 
         <button
           onClick={() => setIsAdding(!isAdding)}
-          className="py-2 px-4 bg-[#ff2056] hover:bg-rose-600 text-white text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-xs shadow-rose-600/20"
+          className="py-1.5 px-3 sm:py-2 sm:px-4 bg-[#ff2056] hover:bg-rose-600 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs shadow-rose-600/20 whitespace-nowrap self-start sm:self-auto"
         >
-          <FiPlus size={15} />
-          <span>+ Add Tag</span>
+          <FiPlus size={14} />
+          <span>Add Tag</span>
         </button>
       </div>
 
@@ -119,29 +119,29 @@ export default function TagsTab() {
       )}
 
       {/* Tags Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4">
         {tags.map((tag) => (
           <div
             key={tag.id}
-            className="bg-white rounded-2xl border border-zinc-200/90 p-4 shadow-xs hover:border-[#ff2056]/30 transition-all flex items-center justify-between"
+            className="bg-white rounded-xl sm:rounded-2xl border border-zinc-200/90 p-2.5 sm:p-4 shadow-xs hover:border-[#ff2056]/30 transition-all flex items-center justify-between gap-1.5"
           >
-            <div className="space-y-1">
+            <div className="space-y-0.5 sm:space-y-1 min-w-0">
               <span
-                className={`inline-block px-2.5 py-1 rounded-lg text-xs font-bold border ${tag.color}`}
+                className={`inline-block px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md sm:rounded-lg text-[10px] sm:text-xs font-bold border truncate max-w-full ${tag.color}`}
               >
                 #{tag.name}
               </span>
-              <p className="text-[11px] text-zinc-400">
-                {tag.count} products linked
+              <p className="text-[10px] sm:text-[11px] text-zinc-400 truncate">
+                {tag.count} linked
               </p>
             </div>
 
             <button
               onClick={() => handleDelete(tag.id, tag.name)}
-              className="p-1.5 text-zinc-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+              className="p-1 sm:p-1.5 text-zinc-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer shrink-0"
               title="Delete Tag"
             >
-              <FiTrash2 size={14} />
+              <FiTrash2 size={13} />
             </button>
           </div>
         ))}

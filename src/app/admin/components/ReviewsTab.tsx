@@ -78,19 +78,19 @@ export default function ReviewsTab() {
   return (
     <div className="space-y-6">
       {/* 1. Header */}
-      <div className="bg-white rounded-2xl border border-zinc-200/90 p-5 shadow-xs flex items-center justify-between">
+      <div className="bg-white rounded-2xl border border-zinc-200/90 p-3.5 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-4">
         <div>
-          <h2 className="text-xl font-bold text-zinc-900 font-serif flex items-center gap-2">
+          <h2 className="text-base sm:text-xl font-bold text-zinc-900 font-serif flex items-center gap-2">
             <FiStar className="text-amber-500 fill-amber-500" />
             <span>Customer Testimonials & Reviews</span>
           </h2>
-          <p className="text-xs text-zinc-500 mt-0.5">
+          <p className="text-[11px] sm:text-xs text-zinc-500 mt-0.5">
             Manage verified customer ratings, testimonials, and public storefront reviews
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="px-3 py-1.5 rounded-xl bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200 flex items-center gap-1.5">
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <span className="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl bg-amber-50 text-amber-800 text-[11px] sm:text-xs font-bold border border-amber-200 flex items-center gap-1.5 whitespace-nowrap">
             <FiStar className="fill-amber-500 text-amber-500" size={13} />
             <span>4.9 / 5.0 Average (128+ Reviews)</span>
           </span>
@@ -102,41 +102,43 @@ export default function ReviewsTab() {
         {reviews.map((r) => (
           <div
             key={r.id}
-            className="bg-white rounded-2xl border border-zinc-200/90 p-5 shadow-xs hover:border-[#ff2056]/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+            className="bg-white rounded-2xl border border-zinc-200/90 p-3.5 sm:p-5 shadow-xs hover:border-[#ff2056]/30 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4"
           >
             <div className="space-y-1.5 flex-1">
-              <div className="flex items-center gap-3">
-                <span className="font-bold text-zinc-900 text-sm">{r.customerName}</span>
+              <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                <span className="font-bold text-zinc-900 text-xs sm:text-sm">{r.customerName}</span>
                 {r.verified && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span className="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                     Verified Buyer
                   </span>
                 )}
-                <span className="text-zinc-400 text-xs">• {r.date}</span>
+                <span className="text-zinc-400 text-[11px] sm:text-xs">• {r.date}</span>
               </div>
 
-              <div className="flex items-center gap-1 text-amber-400">
-                {[...Array(5)].map((_, i) => (
-                  <FiStar
-                    key={i}
-                    size={14}
-                    className={i < r.rating ? "fill-amber-400" : "text-zinc-300"}
-                  />
-                ))}
-                <span className="text-xs font-bold text-zinc-700 ml-1">
+              <div className="flex items-center gap-1 text-amber-400 flex-wrap text-xs">
+                <div className="flex items-center gap-0.5">
+                  {[...Array(5)].map((_, i) => (
+                    <FiStar
+                      key={i}
+                      size={13}
+                      className={i < r.rating ? "fill-amber-400" : "text-zinc-300"}
+                    />
+                  ))}
+                </div>
+                <span className="text-[11px] sm:text-xs font-bold text-zinc-700 ml-1">
                   for <span className="text-[#ff2056] font-semibold">{r.productName}</span>
                 </span>
               </div>
 
-              <p className="text-xs text-zinc-600 leading-relaxed italic">
+              <p className="text-[11px] sm:text-xs text-zinc-600 leading-relaxed italic">
                 &quot;{r.comment}&quot;
               </p>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-zinc-100">
               <button
                 onClick={() => toggleStatus(r.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
+                className={`py-1 px-2.5 sm:py-1.5 sm:px-3 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-colors cursor-pointer ${
                   r.status === "Approved"
                     ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                     : "bg-amber-50 text-amber-800 border border-amber-200"
@@ -147,10 +149,10 @@ export default function ReviewsTab() {
 
               <button
                 onClick={() => deleteReview(r.id)}
-                className="p-2 text-zinc-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
+                className="p-1.5 sm:p-2 text-zinc-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg sm:rounded-xl transition-colors cursor-pointer"
                 title="Delete"
               >
-                <FiTrash2 size={15} />
+                <FiTrash2 size={14} />
               </button>
             </div>
           </div>

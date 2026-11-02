@@ -156,8 +156,84 @@ export default function ProductsTab({
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+          <>
+            {/* Mobile Card View (Zero Horizontal Scroll) */}
+            <div className="sm:hidden divide-y divide-zinc-100">
+              {filteredProducts.map((p) => (
+                <div key={p.id} className="p-3.5 space-y-2.5 hover:bg-zinc-50/60 transition-colors">
+                  <div className="flex items-start gap-3">
+                    <img
+                      src={p.image}
+                      alt={p.name}
+                      className="w-14 h-14 rounded-xl object-cover bg-zinc-100 border border-zinc-200 shrink-0"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-1.5">
+                        <p className="font-bold text-zinc-900 text-xs line-clamp-1">{p.name}</p>
+                        <p className="font-bold text-xs text-[#ff2056] shrink-0">
+                          ৳{p.price.toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                        <span className="text-[10px] text-zinc-400 font-mono">{p.id}</span>
+                        <span className="text-zinc-300">•</span>
+                        <span className="text-[10px] font-bold text-zinc-600 uppercase">
+                          {p.category.replace("-", " ")}
+                        </span>
+                        {p.tag && (
+                          <span className="text-[9px] font-black uppercase px-1 py-0.2 rounded bg-amber-50 text-amber-800 border border-amber-200">
+                            {p.tag}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-zinc-500 mt-0.5 line-clamp-1">
+                        {p.fabric ? `${p.fabric} • ` : ""}Sizes: {p.sizes.join(", ")}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1 border-t border-zinc-100">
+                    <button
+                      onClick={() => handleToggleStock(p)}
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold transition-all cursor-pointer ${
+                        p.inStock
+                          ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                          : "bg-rose-50 text-rose-700 border border-rose-200"
+                      }`}
+                      title="Click to toggle stock status"
+                    >
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full ${
+                          p.inStock ? "bg-emerald-500" : "bg-rose-500"
+                        }`}
+                      />
+                      <span>{p.inStock ? "In Stock" : "Out of Stock"}</span>
+                    </button>
+
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => onEditProduct(p)}
+                        className="p-1.5 rounded-lg bg-purple-50 hover:bg-[#ff2056] text-[#ff2056] hover:text-white transition-colors cursor-pointer"
+                        title="Edit Product Details"
+                      >
+                        <FiEdit2 size={13} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(p)}
+                        className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-500 text-rose-600 hover:text-white transition-colors cursor-pointer"
+                        title="Delete Product"
+                      >
+                        <FiTrash2 size={13} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop & Tablet Table (Preserved) */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-left text-xs">
               <thead className="bg-zinc-50 text-zinc-500 uppercase tracking-wider font-bold border-b border-zinc-200">
                 <tr>
                   <th className="py-3 px-4">Product Details</th>
@@ -263,7 +339,8 @@ export default function ProductsTab({
                 ))}
               </tbody>
             </table>
-          </div>
+            </div>
+          </>
         )}
       </div>
     </div>
