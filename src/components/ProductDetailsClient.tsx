@@ -102,7 +102,9 @@ export default function ProductDetailsClient({
   const [reviewerEmail, setReviewerEmail] = useState("");
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+  const API_BASE =
+    process.env.NEXT_PUBLIC_API_URL ||
+    "https://borkashop-backend.onrender.com/api";
 
   // Sync user info if logged in
   useEffect(() => {

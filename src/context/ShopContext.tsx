@@ -352,7 +352,9 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     deliveryArea?: "dhaka" | "outside_dhaka";
     role?: string;
   } | null>(null);
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+  const API_BASE =
+    process.env.NEXT_PUBLIC_API_URL ||
+    "https://borkashop-backend.onrender.com/api";
 
   // Helper to obtain unique user key across admin, user, and guest roles
   // Logged-in users are identified strictly by their email.

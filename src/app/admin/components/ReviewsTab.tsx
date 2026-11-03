@@ -22,7 +22,9 @@ interface ReviewItem {
 export default function ReviewsTab() {
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+  const API_BASE =
+    process.env.NEXT_PUBLIC_API_URL ||
+    "https://borkashop-backend.onrender.com/api";
 
   const fetchReviews = async () => {
     try {
