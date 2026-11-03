@@ -42,6 +42,11 @@ export const metadata: Metadata = {
     "modest sets",
     "cash on delivery",
   ],
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
