@@ -50,11 +50,21 @@ export default function OrderInvoiceModal({
       const html2canvas = html2canvasModule.default;
 
       const canvas = await html2canvas(printRef.current, {
-        scale: 2.5, // Crisp retina clarity
+        scale: 2, // Sharp clarity without memory overload
         useCORS: true,
-        allowTaint: true,
+        allowTaint: false, // MUST BE FALSE so canvas is never tainted
         backgroundColor: "#ffffff",
         logging: false,
+        imageTimeout: 8000,
+        onclone: (clonedDoc) => {
+          // Gracefully handle images in cloned invoice to prevent CORS canvas blocks
+          const images = clonedDoc.querySelectorAll("#invoice-print-area img");
+          images.forEach((img: any) => {
+            try {
+              img.crossOrigin = "anonymous";
+            } catch {}
+          });
+        },
       });
 
       const fileName = `Invoice-${order.id}`;
@@ -68,12 +78,12 @@ export default function OrderInvoiceModal({
       } else if (downloadFormat === "jpg") {
         const link = document.createElement("a");
         link.download = `${fileName}.jpg`;
-        link.href = canvas.toDataURL("image/jpeg", 0.98);
+        link.href = canvas.toDataURL("image/jpeg", 0.95);
         link.click();
         toast.success("Invoice downloaded as JPG (1 Page)", { id: toastId });
       } else if (downloadFormat === "pdf") {
         const { jsPDF } = await import("jspdf");
-        const imgData = canvas.toDataURL("image/jpeg", 0.98);
+        const imgData = canvas.toDataURL("image/jpeg", 0.95);
 
         const pdf = new jsPDF({
           orientation: "portrait",
@@ -84,7 +94,7 @@ export default function OrderInvoiceModal({
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
 
-        const margin = 12;
+        const margin = 10;
         const maxContentWidth = pageWidth - margin * 2;
         const maxContentHeight = pageHeight - margin * 2;
 
@@ -105,8 +115,12 @@ export default function OrderInvoiceModal({
         toast.success("Invoice downloaded as PDF (1 Page)", { id: toastId });
       }
     } catch (err) {
-      console.error("Export invoice error:", err);
-      toast.error("Failed to generate invoice. Please try again.", { id: toastId });
+      console.warn("Export invoice canvas error, falling back to print dialog:", err);
+      // Fallback: browser print / Save as PDF
+      toast("Canvas export blocked, opening print dialog...", { id: toastId, icon: "🖨️" });
+      setTimeout(() => {
+        window.print();
+      }, 300);
     } finally {
       setIsDownloading(false);
     }
@@ -320,6 +334,7 @@ export default function OrderInvoiceModal({
                                 alt={item.productName || "Product"}
                                 width={40}
                                 height={40}
+                                crossOrigin="anonymous"
                                 className="w-full h-full object-cover"
                               />
                             </div>
