@@ -49,13 +49,13 @@ export default function AdminSidebar({
 
   // Sub-items for Products accordion
   const productSubItems = [
-    { id: "products", label: "All Products", icon: FiLayers },
-    { id: "add-product", label: "Add new product", icon: FiPlusCircle },
-    { id: "brands", label: "Brands", icon: FiAward },
-    { id: "categories", label: "Categories", icon: FiFolder },
-    { id: "tags", label: "Tags", icon: FiTag },
-    { id: "attributes", label: "Attributes", icon: FiSliders },
-    { id: "reviews", label: "Reviews", icon: FiStar },
+    { id: "products", slug: "all-products", label: "All Products", icon: FiLayers },
+    { id: "add-product", slug: "add-product", label: "Add new product", icon: FiPlusCircle },
+    { id: "brands", slug: "brands", label: "Brands", icon: FiAward },
+    { id: "categories", slug: "categories", label: "Categories", icon: FiFolder },
+    { id: "tags", slug: "tags", label: "Tags", icon: FiTag },
+    { id: "attributes", slug: "attributes", label: "Attributes", icon: FiSliders },
+    { id: "reviews", slug: "reviews", label: "Reviews", icon: FiStar },
   ];
 
   const isProductSubActive = productSubItems.some((item) => item.id === activeTab);
@@ -149,8 +149,8 @@ export default function AdminSidebar({
             </p>
 
             {/* Dashboard Overview */}
-            <button
-              type="button"
+            <Link
+              href="/admin"
               onClick={() => handleTabClick("overview")}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl text-xs font-semibold transition-all cursor-pointer text-left ${
                 activeTab === "overview"
@@ -160,7 +160,7 @@ export default function AdminSidebar({
             >
               <FiGrid className={`w-4 h-4 ${activeTab === "overview" ? "text-white" : "text-slate-400"}`} />
               <span>Dashboard Overview</span>
-            </button>
+            </Link>
 
             {/* Products Accordion */}
             <div className="space-y-1">
@@ -195,9 +195,9 @@ export default function AdminSidebar({
                     const SubIcon = sub.icon;
                     const isSubActive = activeTab === sub.id;
                     return (
-                      <button
+                      <Link
                         key={sub.id}
-                        type="button"
+                        href={`/admin/${sub.slug}`}
                         onClick={() => handleTabClick(sub.id)}
                         className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all cursor-pointer text-left ${
                           isSubActive
@@ -211,7 +211,7 @@ export default function AdminSidebar({
                           }`}
                         />
                         <span>{sub.label}</span>
-                      </button>
+                      </Link>
                     );
                   })}
                 </div>
@@ -219,8 +219,8 @@ export default function AdminSidebar({
             </div>
 
             {/* Orders & Sales */}
-            <button
-              type="button"
+            <Link
+              href="/admin/orders"
               onClick={() => handleTabClick("orders")}
               className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer text-left ${
                 activeTab === "orders"
@@ -245,11 +245,11 @@ export default function AdminSidebar({
               >
                 {pendingOrdersCount > 0 ? `${pendingOrdersCount} NEW` : `${orders.length} TOTAL`}
               </span>
-            </button>
+            </Link>
 
             {/* Customers */}
-            <button
-              type="button"
+            <Link
+              href="/admin/customers"
               onClick={() => handleTabClick("customers")}
               className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer text-left ${
                 activeTab === "customers"
@@ -268,11 +268,11 @@ export default function AdminSidebar({
               <span className="text-[9px] px-2 py-0.5 rounded-full font-bold bg-slate-800 text-slate-300">
                 {customers && customers.length > 0 ? customers.length : (new Set(orders.map(o => o.phone).filter(Boolean))).size}
               </span>
-            </button>
+            </Link>
 
             {/* Alerts & Notifications */}
-            <button
-              type="button"
+            <Link
+              href="/admin/notifications"
               onClick={() => handleTabClick("notifications")}
               className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer text-left ${
                 activeTab === "notifications"
@@ -299,11 +299,11 @@ export default function AdminSidebar({
                   {unreadNotificationsCount} New
                 </span>
               )}
-            </button>
+            </Link>
 
             {/* Reports & Analytics */}
-            <button
-              type="button"
+            <Link
+              href="/admin/analytics"
               onClick={() => handleTabClick("analytics")}
               className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer text-left ${
                 activeTab === "analytics"
@@ -319,11 +319,11 @@ export default function AdminSidebar({
                 />
                 <span>Reports & Analytics</span>
               </div>
-            </button>
+            </Link>
 
             {/* Store Settings */}
-            <button
-              type="button"
+            <Link
+              href="/admin/settings"
               onClick={() => handleTabClick("settings")}
               className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer text-left ${
                 activeTab === "settings"
@@ -339,7 +339,7 @@ export default function AdminSidebar({
                 />
                 <span>Store Settings</span>
               </div>
-            </button>
+            </Link>
           </nav>
         </div>
 

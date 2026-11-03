@@ -34,7 +34,7 @@ export default function ProductDetailsClient({
   relatedProducts,
 }: ProductDetailsClientProps) {
   const router = useRouter();
-  const { addToCart, openQuickOrder, toggleWishlist, isInWishlist } = useShop();
+  const { addToCart, openQuickOrder, toggleWishlist, isInWishlist, shippingSettings } = useShop();
 
   const isWishlisted = isInWishlist(product.id);
 
@@ -74,7 +74,9 @@ export default function ProductDetailsClient({
   };
 
   const handleWhatsAppOrder = () => {
-    const phone = "8801793679254";
+    const rawPhone = shippingSettings?.helplinePhone || "01793679254";
+    const digits = rawPhone.replace(/[^0-9]/g, "");
+    const phone = digits.startsWith("88") ? digits : `88${digits}`;
     const currentUrl = typeof window !== "undefined" ? window.location.href : "";
     const totalPrice = (product.price * quantity).toLocaleString();
     const message = `আসসালামু আলাইকুম, আমি Borka Shop থেকে এই প্রোডাক্টটি অর্ডার করতে চাই:

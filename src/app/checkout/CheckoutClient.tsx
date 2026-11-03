@@ -16,11 +16,21 @@ import {
   FiShoppingBag,
   FiArrowRight,
 } from "react-icons/fi";
-import { FaWhatsapp } from "react-icons/fa";
 import toast from "react-hot-toast";
 
 export default function CheckoutClient() {
-  const { cart, removeFromCart, updateQuantity, clearCart, placeOrder, addToCart, syncCheckoutInfo } = useShop();
+  const {
+    cart,
+    removeFromCart,
+    updateQuantity,
+    clearCart,
+    placeOrder,
+    addToCart,
+    syncCheckoutInfo,
+    role,
+    currentUser,
+    shippingSettings,
+  } = useShop();
 
   // Form states
   const [fullName, setFullName] = useState("");
@@ -36,6 +46,49 @@ export default function CheckoutClient() {
     total: number;
     phone: string;
   } | null>(null);
+
+  // Auto-fill form fields for logged-in user, ensure completely clean/empty for guests
+  useEffect(() => {
+    const isUserLoggedIn =
+      role === "user" ||
+      role === "admin" ||
+      (typeof window !== "undefined" && !!localStorage.getItem("borkashop_user"));
+
+    if (isUserLoggedIn) {
+      let n = currentUser?.name || "";
+      let p = currentUser?.phone || "";
+      let a = currentUser?.address || "";
+      let area = currentUser?.deliveryArea || "outside_dhaka";
+
+      // If currentUser from context is not yet populated, read directly from localStorage
+      if (!n || !p || !a) {
+        try {
+          const raw = localStorage.getItem("borkashop_user");
+          if (raw) {
+            const u = JSON.parse(raw);
+            if (!n && u.name) n = u.name;
+            if (!p && u.phone) p = u.phone;
+            if (!a && u.address) a = u.address;
+            if (u.deliveryArea) area = u.deliveryArea;
+          }
+        } catch {}
+      }
+
+      if (n) setFullName(n);
+      if (p) setPhoneNumber(p);
+      if (a) setFullAddress(a);
+      if (area) setDeliveryArea(area as "dhaka" | "outside_dhaka");
+    } else {
+      // Guest User: NOTHING should be pre-filled (clean, empty form)
+      setFullName("");
+      setPhoneNumber("");
+      setFullAddress("");
+      try {
+        localStorage.removeItem("borkashop_guest_phone");
+        localStorage.removeItem("borkashop_guest_name");
+      } catch {}
+    }
+  }, [currentUser, role]);
 
   // Sync draft checkout info to 'my-collection' in real-time
   useEffect(() => {
@@ -56,7 +109,16 @@ export default function CheckoutClient() {
 
   // Calculations
   const subtotal = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
-  const deliveryCharge = deliveryArea === "dhaka" ? 100 : 150;
+  const isFreeShipping = Boolean(
+    shippingSettings?.freeShippingThreshold &&
+    shippingSettings.freeShippingThreshold > 0 &&
+    subtotal >= shippingSettings.freeShippingThreshold
+  );
+  const deliveryCharge = isFreeShipping
+    ? 0
+    : deliveryArea === "dhaka"
+    ? (shippingSettings?.insideDhaka ?? 70)
+    : (shippingSettings?.outsideDhaka ?? 130);
   const grandTotal = Math.max(0, subtotal - appliedDiscount + deliveryCharge);
 
   // Handle coupon apply
@@ -122,7 +184,7 @@ export default function CheckoutClient() {
         subtotal,
         total: grandTotal,
         paymentMethod: "cod",
-        role: "guest",
+        role: role === "user" ? "user" : "guest",
       });
 
       clearCart();
@@ -189,22 +251,10 @@ export default function CheckoutClient() {
             </div>
           </div>
 
-          <div className="space-y-3 pt-2">
-            <a
-              href={`https://wa.me/8801793679254?text=${encodeURIComponent(
-                `আসসালামু আলাইকুম! আমি বোরকা শপ থেকে অর্ডার করেছি। অর্ডার আইডি: ${orderPlaced.id}, মোট টাকা: ${orderPlaced.total}৳। অর্ডার কনফার্ম করতে সহায়তা চাচ্ছি।`
-              )}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full bg-[#008a3e] hover:bg-[#007a37] text-white py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-colors cursor-pointer"
-            >
-              <FaWhatsapp size={18} />
-              <span>WhatsApp-এ অর্ডার কনফার্ম করুন (01793679254)</span>
-            </a>
-
+          <div className="pt-2">
             <Link
               href="/shop"
-              className="w-full bg-zinc-100 hover:bg-zinc-200 text-zinc-800 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              className="w-full bg-[#4F213B] hover:bg-[#3B152B] text-white py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-colors cursor-pointer"
             >
               <FiShoppingBag size={16} />
               <span>Continue Shopping</span>
@@ -315,7 +365,9 @@ export default function CheckoutClient() {
                       />
                       <span className="font-bold text-zinc-900">Inside Dhaka</span>
                     </div>
-                    <span className="text-zinc-700 font-semibold">100৳</span>
+                    <span className="text-zinc-700 font-semibold">
+                      {isFreeShipping ? "FREE" : `${shippingSettings?.insideDhaka ?? 70}৳`}
+                    </span>
                   </label>
 
                   {/* Outside Dhaka */}
@@ -337,7 +389,9 @@ export default function CheckoutClient() {
                       />
                       <span className="font-bold text-zinc-900">Outside Dhaka</span>
                     </div>
-                    <span className="text-zinc-700 font-semibold">150৳</span>
+                    <span className="text-zinc-700 font-semibold">
+                      {isFreeShipping ? "FREE" : `${shippingSettings?.outsideDhaka ?? 130}৳`}
+                    </span>
                   </label>
                 </div>
               </div>

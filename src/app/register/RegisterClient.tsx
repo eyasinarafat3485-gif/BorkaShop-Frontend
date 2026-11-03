@@ -25,7 +25,7 @@ import { useShop } from "@/context/ShopContext";
 
 export default function RegisterClient() {
   const router = useRouter();
-  const { setRole } = useShop();
+  const { setRole, resetForNewUser } = useShop();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -106,18 +106,13 @@ export default function RegisterClient() {
         normalizedEmail.startsWith("admin");
 
       if (isAdmin) {
-        setRole("admin", true);
-        try {
-          localStorage.setItem("borkashop_role", "admin");
-          if (data?.user) {
-            localStorage.setItem(
-              "borkashop_user",
-              JSON.stringify({ ...data.user, role: "admin" })
-            );
-          }
-        } catch {
-          // ignore
-        }
+        await resetForNewUser({
+          ...(data?.user || {}),
+          email: normalizedEmail,
+          name: data?.user?.name || name.trim(),
+          role: "admin",
+        });
+
         toast.success(
           `Admin Account created successfully! Welcome ${data?.user?.name || name.trim()}! Redirecting to Dashboard...`,
           {
@@ -132,18 +127,13 @@ export default function RegisterClient() {
         );
         router.push("/admin");
       } else {
-        setRole("user", true);
-        try {
-          localStorage.setItem("borkashop_role", "user");
-          if (data?.user) {
-            localStorage.setItem(
-              "borkashop_user",
-              JSON.stringify({ ...data.user, role: "user" })
-            );
-          }
-        } catch {
-          // ignore
-        }
+        await resetForNewUser({
+          ...(data?.user || {}),
+          email: normalizedEmail,
+          name: data?.user?.name || name.trim(),
+          role: "user",
+        });
+
         toast.success(
           `Account created successfully! Welcome to Borka Shop, ${data?.user?.name || name.trim()}!`,
           {

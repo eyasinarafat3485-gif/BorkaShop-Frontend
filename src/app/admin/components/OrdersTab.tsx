@@ -334,7 +334,7 @@ export default function OrdersTab({
                         <span className="font-bold text-zinc-900 block">{ord.id}</span>
                         <span className="text-[11px] text-zinc-400 font-sans">{ord.createdAt}</span>
                         <span
-                          className={`mt-1 inline-block text-[9px] font-bold px-1.5 py-0.2 rounded capitalize ${
+                          className={`mt-1 inline-block text-[9px] font-bold px-1.5 py-0.2 rounded capitalize whitespace-nowrap ${
                             ord.role === "user" ? "bg-purple-50 text-[#ff2056]" : "bg-zinc-100 text-zinc-600"
                           }`}
                         >

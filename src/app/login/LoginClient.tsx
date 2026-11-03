@@ -75,7 +75,6 @@ export default function LoginClient() {
         normalizedEmail.startsWith("admin");
 
       if (isAdmin) {
-        setRole("admin", true);
         try {
           localStorage.setItem("borkashop_role", "admin");
           if (data?.user) {
@@ -87,6 +86,7 @@ export default function LoginClient() {
         } catch {
           // ignore
         }
+        setRole("admin", true);
         toast.success(
           `Welcome Administrator ${data?.user?.name || ""}! Redirecting to Dashboard...`,
           {
@@ -101,7 +101,6 @@ export default function LoginClient() {
         );
         router.push("/admin");
       } else {
-        setRole("user", true);
         try {
           localStorage.setItem("borkashop_role", "user");
           if (data?.user) {
@@ -113,6 +112,7 @@ export default function LoginClient() {
         } catch {
           // ignore
         }
+        setRole("user", true);
         toast.success(
           `Welcome back, ${data?.user?.name || "Customer"}! Logged in successfully.`,
           {

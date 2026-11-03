@@ -169,10 +169,12 @@ export default function CustomersTab() {
                         </div>
                       </div>
                       <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold whitespace-nowrap inline-flex items-center shrink-0 ${
                           c.role === "Registered Member"
                             ? "bg-purple-50 text-[#ff2056] border border-purple-200"
-                            : "bg-zinc-100 text-zinc-600"
+                            : c.role === "Admin"
+                            ? "bg-amber-50 text-amber-800 border border-amber-200"
+                            : "bg-zinc-100 text-zinc-600 border border-zinc-200"
                         }`}
                       >
                         {c.role}
@@ -269,12 +271,14 @@ export default function CustomersTab() {
                       </td>
 
                       {/* Account Type */}
-                      <td className="py-3.5 px-4">
+                      <td className="py-3.5 px-4 whitespace-nowrap">
                         <span
-                          className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                          className={`px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap inline-flex items-center shrink-0 ${
                             c.role === "Registered Member"
                               ? "bg-purple-50 text-[#4F213B] border border-purple-200"
-                              : "bg-zinc-100 text-zinc-600"
+                              : c.role === "Admin"
+                              ? "bg-amber-50 text-amber-800 border border-amber-200"
+                              : "bg-zinc-100 text-zinc-600 border border-zinc-200"
                           }`}
                         >
                           {c.role}

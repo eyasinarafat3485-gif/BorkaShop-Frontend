@@ -9,22 +9,21 @@ import {
   FiPhone,
   FiMail,
   FiChevronRight,
-  FiHome,
-  FiShoppingBag,
-  FiUser,
-  FiGrid,
-  FiShoppingCart,
 } from "react-icons/fi";
 import {
   FaFacebookF,
-  FaInstagram,
-  FaYoutube,
+  FaWhatsapp,
+  FaEnvelope,
 } from "react-icons/fa";
-import { FaXTwitter } from "react-icons/fa6";
 
 export default function Footer() {
-  const { cartCount, setIsCartOpen, setIsTrackOrderOpen } = useShop();
+  const { setIsTrackOrderOpen, shippingSettings } = useShop();
   const pathname = usePathname();
+
+  const phone = shippingSettings?.helplinePhone || "01793 679 254";
+  const cleanPhone = phone.replace(/[^0-9]/g, "");
+  const waPhone = cleanPhone.startsWith("88") ? cleanPhone : `88${cleanPhone}`;
+  const email = shippingSettings?.helplineEmail || "support@burkashop.com";
 
   if (pathname.startsWith("/admin") || pathname.startsWith("/dashboard")) {
     return null;
@@ -54,10 +53,10 @@ export default function Footer() {
                   <FiPhone className="text-black mt-1 flex-shrink-0" size={18} />
                   <div>
                     <a
-                      href="tel:01793679254"
+                      href={`tel:${cleanPhone}`}
                       className="font-bold text-sm sm:text-base text-zinc-950 hover:text-[#4B2438] transition-colors"
                     >
-                      01793 679 254
+                      {phone}
                     </a>
                     <p className="text-xs text-zinc-600 mt-0.5">Phone & WhatsApp (9:00 AM – 11:00 PM)</p>
                   </div>
@@ -67,10 +66,10 @@ export default function Footer() {
                 <div className="flex items-center gap-3">
                   <FiMail className="text-black flex-shrink-0" size={18} />
                   <a
-                    href="mailto:support@burkashop.com"
+                    href={`mailto:${email}`}
                     className="text-xs sm:text-[13.5px] text-zinc-900 hover:text-[#4B2438] transition-colors"
                   >
-                    support@burkashop.com
+                    {email}
                   </a>
                 </div>
               </div>
@@ -172,48 +171,45 @@ export default function Footer() {
                   Stay connected with us
                 </p>
 
-                {/* Social Media Circular Colored Icons */}
+                {/* Social & Contact Circular Colored Icons */}
                 <div className="flex items-center gap-2.5">
+                  {/* Facebook */}
                   <a
-                    href="https://facebook.com"
+                    href="https://www.facebook.com/bengalitbd?_rdc=1&_rdr#"
                     target="_blank"
                     rel="noreferrer"
-                    className="w-8 h-8 rounded-full bg-[#3B5998] text-white flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm"
+                    className="w-8 h-8 rounded-full bg-[#1877F2] text-white flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm"
                     aria-label="Facebook"
+                    title="Facebook"
                   >
                     <FaFacebookF size={13} />
                   </a>
+
+                  {/* Email */}
                   <a
-                    href="https://twitter.com"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm"
-                    aria-label="X Twitter"
+                    href={`mailto:${email}`}
+                    className="w-8 h-8 rounded-full bg-[#EA4335] text-white flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm"
+                    aria-label="Email"
+                    title={`Email: ${email}`}
                   >
-                    <FaXTwitter size={13} />
+                    <FaEnvelope size={13} />
                   </a>
+
+                  {/* WhatsApp */}
                   <a
-                    href="https://youtube.com"
+                    href={`https://wa.me/${waPhone}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-8 h-8 rounded-full bg-[#CD201F] text-white flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm"
-                    aria-label="YouTube"
+                    className="w-8 h-8 rounded-full bg-[#25D366] text-white flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm"
+                    aria-label="WhatsApp"
+                    title={`WhatsApp: +${waPhone}`}
                   >
-                    <FaYoutube size={14} />
-                  </a>
-                  <a
-                    href="https://instagram.com"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="w-8 h-8 rounded-full bg-[#262626] text-white flex items-center justify-center hover:opacity-90 transition-opacity shadow-sm"
-                    aria-label="Instagram"
-                  >
-                    <FaInstagram size={14} />
+                    <FaWhatsapp size={16} />
                   </a>
                 </div>
               </div>
 
-              {/* We Accept: bKash, Nagad, Rocket (Single Line) */}
+              {/* We Accept: bKash, Nagad, COD (Single Line) */}
               <div className="pt-1">
                 <h4 className="font-semibold text-black text-xs sm:text-[13.5px] mb-2">
                   We Accept
@@ -247,18 +243,22 @@ export default function Footer() {
                     />
                   </div>
 
-                  {/* Rocket */}
+                  {/* COD (Cash on Delivery) */}
                   <div
-                    className="bg-white border border-zinc-200 rounded-md px-1.5 sm:px-2 py-1 shadow-xs hover:border-[#8C3494]/50 transition-colors flex items-center justify-center shrink-0"
-                    title="Rocket"
+                    className="bg-white border border-zinc-200 rounded-md px-1.5 sm:px-2 py-1 shadow-xs hover:border-[#4F213B]/50 transition-colors flex items-center justify-center gap-1.5 shrink-0"
+                    title="Cash on Delivery (COD)"
                   >
-                    <Image
-                      src="/rocket.svg"
-                      alt="Rocket"
-                      width={68}
-                      height={22}
-                      className="h-4.5 sm:h-5 w-auto object-contain"
-                    />
+                    <div className="w-4.5 sm:w-5 h-4.5 sm:h-5 rounded bg-emerald-600 text-white flex items-center justify-center font-bold text-[10px] sm:text-[11px] shrink-0 shadow-2xs">
+                      ৳
+                    </div>
+                    <div className="flex flex-col leading-none">
+                      <span className="font-extrabold text-[11px] sm:text-[12px] text-zinc-900 tracking-tight">
+                        COD
+                      </span>
+                      <span className="text-[7px] sm:text-[7.5px] text-zinc-500 font-semibold tracking-tighter">
+                        Cash On Delivery
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -267,8 +267,8 @@ export default function Footer() {
         </div>
 
         {/* Bottom Burgundy Bar */}
-        <div className="bg-[#4B2438] text-white py-3.5 sm:py-4 pb-20 sm:pb-4 border-t border-black/10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs sm:text-[13px]">
+        <div className="bg-[#4B2438] text-white py-3.5 sm:py-4 border-t border-black/10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-row items-center justify-between gap-2 text-[11px] sm:text-[13px] whitespace-nowrap">
             <p className="text-white/95 font-medium">© 2026 BurkaShop</p>
             <p className="text-white/80">
               Design by{" "}
@@ -284,61 +284,6 @@ export default function Footer() {
           </div>
         </div>
       </footer>
-
-      {/* Mobile Sticky Bottom Bar (Exact Elementor icon box floating navigation on borkashop.borbila.net) */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-zinc-200 shadow-[0_-2px_10px_rgba(0,0,0,0.06)] px-2 py-1.5 flex items-center justify-around text-center">
-        {/* 1. Menu */}
-        <a
-          href="#categories"
-          className="flex flex-col items-center justify-center text-zinc-700 hover:text-[#4F213B] p-1 flex-1"
-        >
-          <FiGrid size={18} />
-          <span className="text-[10px] mt-0.5 font-medium">Menu</span>
-        </a>
-
-        {/* 2. Shop */}
-        <Link
-          href="/shop"
-          className="flex flex-col items-center justify-center text-zinc-700 hover:text-[#4F213B] p-1 flex-1"
-        >
-          <FiShoppingBag size={18} />
-          <span className="text-[10px] mt-0.5 font-medium">Shop</span>
-        </Link>
-
-        {/* 3. Home (Circular Raised Button) */}
-        <Link
-          href="/"
-          className="flex flex-col items-center justify-center -mt-4 bg-[#4F213B] text-white w-12 h-12 rounded-full shadow-lg border-2 border-white flex-shrink-0"
-          aria-label="Home"
-        >
-          <FiHome size={20} />
-        </Link>
-
-        {/* 4. Cart with badge */}
-        <button
-          onClick={() => setIsCartOpen(true)}
-          className="flex flex-col items-center justify-center text-zinc-700 hover:text-[#4F213B] p-1 flex-1 relative"
-        >
-          <div className="relative">
-            <FiShoppingCart size={18} />
-            {cartCount > 0 && (
-              <span className="absolute -top-1.5 -right-2 bg-[#4F213B] text-white text-[9px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
-                {cartCount}
-              </span>
-            )}
-          </div>
-          <span className="text-[10px] mt-0.5 font-medium">Cart</span>
-        </button>
-
-        {/* 5. Account */}
-        <Link
-          href="/login"
-          className="flex flex-col items-center justify-center text-zinc-700 hover:text-[#4F213B] p-1 flex-1"
-        >
-          <FiUser size={18} />
-          <span className="text-[10px] mt-0.5 font-medium">Account</span>
-        </Link>
-      </div>
     </>
   );
 }

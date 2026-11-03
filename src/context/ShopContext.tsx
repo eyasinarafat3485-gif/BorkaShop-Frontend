@@ -91,6 +91,16 @@ interface ShopContextType {
   deleteNotification: (id: string) => Promise<void>;
   fetchNotifications: (type?: string, page?: number) => Promise<void>;
   syncCheckoutInfo: (info: any) => void;
+  resetForNewUser: (user: { email: string; name?: string; role?: string; id?: string }) => Promise<void>;
+  currentUser: {
+    id?: string;
+    name?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    deliveryArea?: "dhaka" | "outside_dhaka";
+    role?: string;
+  } | null;
 }
 
 const ShopContext = createContext<ShopContextType | undefined>(undefined);
@@ -333,6 +343,15 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   });
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{
+    id?: string;
+    name?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    deliveryArea?: "dhaka" | "outside_dhaka";
+    role?: string;
+  } | null>(null);
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
   // Helper to obtain unique user key across admin, user, and guest roles
@@ -368,14 +387,11 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         localStorage.setItem("borkashop_guest_device_id", deviceId);
       }
 
-      const guestPhone = localStorage.getItem("borkashop_guest_phone") || "";
-      const guestName = localStorage.getItem("borkashop_guest_name") || "";
-
       return {
         userKey: `guest:${deviceId}`,
         email: "",
-        phone: guestPhone,
-        customerName: guestName,
+        phone: "",
+        customerName: "",
         role: "guest" as UserRole,
         isGuest: true,
       };
@@ -406,8 +422,72 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Explicit initialization for a BRAND NEW user (ensures zero guest data leakage)
+  const resetForNewUser = async (user: { email: string; name?: string; role?: string; id?: string }) => {
+    setIsDataLoaded(false);
+
+    // Instantly reset React memory states to empty
+    setCart([]);
+    setWishlist([]);
+    setOrders([]);
+
+    const cleanEmail = user.email.toLowerCase().trim();
+    const newUserKey = `user:${cleanEmail}`;
+    const userRole = (user.role || "user") as UserRole;
+
+    const initialUserData = {
+      id: user.id || "",
+      name: user.name || "",
+      email: cleanEmail,
+      phone: "",
+      address: "",
+      deliveryArea: "outside_dhaka" as const,
+      role: userRole,
+    };
+    setCurrentUser(initialUserData);
+
+    try {
+      localStorage.setItem("borkashop_user", JSON.stringify({ ...user, ...initialUserData }));
+      localStorage.setItem("borkashop_role", userRole);
+      // Clean isolated storage keys for this new user
+      localStorage.setItem(`borkashop_cart_${newUserKey}`, JSON.stringify([]));
+      localStorage.setItem(`borkashop_wishlist_${newUserKey}`, JSON.stringify([]));
+      // Remove any guest checkout details so new user starts completely fresh
+      localStorage.removeItem("borkashop_guest_phone");
+      localStorage.removeItem("borkashop_guest_name");
+      localStorage.removeItem("borkashop_guest_email");
+    } catch {}
+
+    setRoleState(userRole);
+
+    // Initialize clean document in MongoDB Atlas 'my-collection'
+    try {
+      await fetch(`${API_BASE}/my-collection/sync`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userKey: newUserKey,
+          email: cleanEmail,
+          customerName: user.name || "",
+          role: userRole,
+          userId: user.id || "",
+          cart: [],
+          wishlist: [],
+          orders: [],
+          isNewUser: true,
+        }),
+      });
+    } catch (err) {
+      console.warn("Failed to initialize new user in my-collection:", err);
+    } finally {
+      setIsDataLoaded(true);
+    }
+  };
+
   // Load and isolate data strictly for the active user or guest device
   const loadActiveUserData = async () => {
+    setIsDataLoaded(false);
+
     const ident = getUserIdentity();
     const cartStorageKey = `borkashop_cart_${ident.userKey}`;
     const wishlistStorageKey = `borkashop_wishlist_${ident.userKey}`;
@@ -450,12 +530,54 @@ export function ShopProvider({ children }: { children: ReactNode }) {
           } else {
             setOrders(json.data.orders || []);
           }
+
+          // If logged-in user: resolve their saved profile info from account & database
+          if (!ident.isGuest) {
+            try {
+              const savedUserStr = localStorage.getItem("borkashop_user");
+              const u = savedUserStr ? JSON.parse(savedUserStr) : {};
+              const doc = json.data;
+              const lastOrder = Array.isArray(doc.orders) && doc.orders.length > 0 ? doc.orders[0] : null;
+              const resolvedUser = {
+                id: u.id || doc.userId || "",
+                name: u.name || doc.customerName || "",
+                email: u.email || doc.email || ident.email || "",
+                phone: u.phone || doc.phone || doc.checkoutInfo?.phone || lastOrder?.phone || "",
+                address: u.address || doc.checkoutInfo?.address || lastOrder?.address || "",
+                deliveryArea: (u.deliveryArea || doc.checkoutInfo?.deliveryArea || lastOrder?.deliveryZone || "outside_dhaka") as "dhaka" | "outside_dhaka",
+                role: u.role || doc.role || ident.role,
+              };
+              setCurrentUser(resolvedUser);
+              localStorage.setItem("borkashop_user", JSON.stringify({ ...u, ...resolvedUser }));
+            } catch {}
+          } else {
+            setCurrentUser(null);
+          }
         } else {
           // If no doc in my-collection yet, start empty (no products from previous users)
           setCart([]);
           setWishlist([]);
           if (ident.role !== "admin") {
             setOrders([]);
+          }
+          if (ident.isGuest) {
+            setCurrentUser(null);
+          } else {
+            try {
+              const savedUserStr = localStorage.getItem("borkashop_user");
+              if (savedUserStr) {
+                const u = JSON.parse(savedUserStr);
+                setCurrentUser({
+                  id: u.id || "",
+                  name: u.name || "",
+                  email: u.email || "",
+                  phone: u.phone || "",
+                  address: u.address || "",
+                  deliveryArea: u.deliveryArea || "outside_dhaka",
+                  role: u.role || ident.role,
+                });
+              }
+            } catch {}
           }
           try {
             localStorage.setItem(cartStorageKey, JSON.stringify([]));
@@ -507,11 +629,38 @@ export function ShopProvider({ children }: { children: ReactNode }) {
 
   const syncCheckoutInfo = (info: any) => {
     try {
-      if (info.phone) {
-        localStorage.setItem("borkashop_guest_phone", info.phone);
-      }
-      if (info.fullName) {
-        localStorage.setItem("borkashop_guest_name", info.fullName);
+      const ident = getUserIdentity();
+      if (!ident.isGuest) {
+        // Authenticated user: update their profile in context & localStorage
+        setCurrentUser((prev) => ({
+          ...prev,
+          name: info.fullName || prev?.name,
+          phone: info.phone || prev?.phone,
+          address: info.address || prev?.address,
+          deliveryArea: info.deliveryArea || prev?.deliveryArea,
+        }));
+        try {
+          const raw = localStorage.getItem("borkashop_user");
+          if (raw) {
+            const u = JSON.parse(raw);
+            localStorage.setItem(
+              "borkashop_user",
+              JSON.stringify({
+                ...u,
+                name: info.fullName || u.name,
+                phone: info.phone || u.phone,
+                address: info.address || u.address,
+                deliveryArea: info.deliveryArea || u.deliveryArea,
+              })
+            );
+          }
+        } catch {}
+      } else {
+        // Guest user: strictly do not store in persistent guest cache
+        try {
+          localStorage.removeItem("borkashop_guest_phone");
+          localStorage.removeItem("borkashop_guest_name");
+        } catch {}
       }
       syncToMyCollection({ checkoutInfo: info });
     } catch {
@@ -545,6 +694,12 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     setRoleState(newRole);
     try {
       localStorage.setItem("borkashop_role", newRole);
+      if (newRole === "guest") {
+        localStorage.removeItem("borkashop_user");
+        localStorage.removeItem("borkashop_guest_phone");
+        localStorage.removeItem("borkashop_guest_name");
+        setCurrentUser(null);
+      }
     } catch {
       // ignore
     }
@@ -652,17 +807,25 @@ export function ShopProvider({ children }: { children: ReactNode }) {
 
   const placeOrder = (orderData: Omit<Order, "id" | "createdAt" | "status">): Order => {
     const orderNumber = Math.floor(1000 + Math.random() * 9000);
+    const orderId = `BS-${orderNumber}`;
+    const orderCreatedAt = new Date().toISOString();
+
+    const userIdent = getUserIdentity();
+    const effectiveRole = orderData.role || (role === "user" ? "user" : "guest");
+
     const newOrder: Order = {
       ...orderData,
-      id: `BS-${orderNumber}`,
+      id: orderId,
       status: "Pending",
-      createdAt: "Just now",
+      createdAt: orderCreatedAt,
+      role: effectiveRole,
     };
 
     setOrders((prev) => {
-      const updated = [newOrder, ...prev];
+      const updated = [newOrder, ...prev.filter((o) => o.id !== newOrder.id)];
       try {
         localStorage.setItem("borkashop_orders", JSON.stringify(updated));
+        localStorage.setItem("borkashop_admin_orders", JSON.stringify(updated));
       } catch {}
       return updated;
     });
@@ -678,18 +841,24 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       } catch {}
     }
 
-    const userIdent = getUserIdentity();
-
-    // Sync to MongoDB Atlas in background
+    // Sync to MongoDB Atlas 'orders' collection in background & refresh dashboard
     fetch(`${API_BASE}/orders`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...newOrder,
+        createdAt: orderCreatedAt,
         userKey: userIdent.userKey,
         email: userIdent.email || "",
       }),
-    }).catch((err) => console.warn("Failed to sync new order to backend:", err));
+    })
+      .then(async (res) => {
+        if (res.ok) {
+          // Immediately refresh admin dashboard live data and notifications
+          await refreshDashboardData();
+        }
+      })
+      .catch((err) => console.warn("Failed to sync new order to backend:", err));
 
     // Also sync order and reset cart in 'my-collection'
     syncToMyCollection({ order: newOrder, cart: [] });
@@ -842,15 +1011,32 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const updateShippingSettings = (newSettings: Partial<ShippingSettings>) => {
-    setShippingSettings((prev) => {
-      const updated = { ...prev, ...newSettings };
-      try {
-        localStorage.setItem("borkashop_shipping_settings", JSON.stringify(updated));
-      } catch {}
-      return updated;
-    });
-    toast.success("Store & shipping settings saved!", { icon: "⚙️" });
+  const updateShippingSettings = async (newSettings: Partial<ShippingSettings>) => {
+    const updated = { ...shippingSettings, ...newSettings };
+    setShippingSettings(updated);
+    try {
+      localStorage.setItem("borkashop_shipping_settings", JSON.stringify(updated));
+    } catch {}
+
+    try {
+      const res = await fetch(`${API_BASE}/settings`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updated),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.settings) {
+          setShippingSettings(data.settings);
+          try {
+            localStorage.setItem("borkashop_shipping_settings", JSON.stringify(data.settings));
+          } catch {}
+        }
+      }
+    } catch (err) {
+      console.warn("Failed to save settings to backend storesettings collection:", err);
+    }
+    toast.success("Store & shipping settings saved to database!", { icon: "⚙️" });
   };
 
   // Helpers for read notification IDs persistence
@@ -1046,10 +1232,11 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   // Live real data synchronization from MongoDB Atlas
   const refreshDashboardData = async () => {
     try {
-      const [prodRes, ordRes, custRes] = await Promise.all([
+      const [prodRes, ordRes, custRes, setRes] = await Promise.all([
         fetch(`${API_BASE}/products`),
         fetch(`${API_BASE}/orders`),
         fetch(`${API_BASE}/admin/customers`),
+        fetch(`${API_BASE}/settings`),
       ]);
 
       if (prodRes.ok) {
@@ -1065,12 +1252,10 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       if (ordRes.ok) {
         const ordData = await ordRes.json();
         if (ordData.success && Array.isArray(ordData.orders)) {
-          if (role === "admin") {
-            setOrders(ordData.orders);
-            try {
-              localStorage.setItem("borkashop_admin_orders", JSON.stringify(ordData.orders));
-            } catch {}
-          }
+          setOrders(ordData.orders);
+          try {
+            localStorage.setItem("borkashop_admin_orders", JSON.stringify(ordData.orders));
+          } catch {}
         }
       }
 
@@ -1078,6 +1263,16 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         const custData = await custRes.json();
         if (custData.success && Array.isArray(custData.customers)) {
           setCustomers(custData.customers);
+        }
+      }
+
+      if (setRes.ok) {
+        const setData = await setRes.json();
+        if (setData.success && setData.settings) {
+          setShippingSettings(setData.settings);
+          try {
+            localStorage.setItem("borkashop_shipping_settings", JSON.stringify(setData.settings));
+          } catch {}
         }
       }
 
@@ -1091,12 +1286,10 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // 1. Initial hydration from localStorage
     try {
-      if (role === "admin") {
-        const savedOrders = localStorage.getItem("borkashop_admin_orders");
-        if (savedOrders) {
-          const parsed = JSON.parse(savedOrders);
-          if (Array.isArray(parsed) && parsed.length > 0) setOrders(parsed);
-        }
+      const savedOrders = localStorage.getItem("borkashop_admin_orders") || localStorage.getItem("borkashop_orders");
+      if (savedOrders) {
+        const parsed = JSON.parse(savedOrders);
+        if (Array.isArray(parsed) && parsed.length > 0) setOrders(parsed);
       }
       const savedProducts = localStorage.getItem("borkashop_custom_products");
       if (savedProducts) {
@@ -1162,6 +1355,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         deleteNotification,
         fetchNotifications,
         syncCheckoutInfo,
+        resetForNewUser,
+        currentUser,
       }}
     >
       {children}

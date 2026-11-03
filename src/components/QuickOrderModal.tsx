@@ -18,7 +18,7 @@ import {
 import toast from "react-hot-toast";
 
 export default function QuickOrderModal() {
-  const { quickOrderProduct, closeQuickOrder, placeOrder, role } = useShop();
+  const { quickOrderProduct, closeQuickOrder, placeOrder, role, currentUser, shippingSettings } = useShop();
 
   const [size, setSize] = useState<string>("");
   const [color, setColor] = useState<string>("");
@@ -35,20 +35,63 @@ export default function QuickOrderModal() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmedOrder, setConfirmedOrder] = useState<any | null>(null);
 
-  // Initialize defaults when quickOrderProduct opens
+  // Initialize defaults and prefill for logged-in users / keep empty for guests
   React.useEffect(() => {
     if (quickOrderProduct) {
       setSize(quickOrderProduct.sizes[0] || "54");
       setColor(quickOrderProduct.colors[0]?.name || "Jet Black");
       setQuantity(1);
       setConfirmedOrder(null);
+
+      const isUserLoggedIn =
+        role === "user" ||
+        role === "admin" ||
+        (typeof window !== "undefined" && !!localStorage.getItem("borkashop_user"));
+
+      if (isUserLoggedIn) {
+        let n = currentUser?.name || "";
+        let p = currentUser?.phone || "";
+        let a = currentUser?.address || "";
+        let z = currentUser?.deliveryArea || "dhaka";
+
+        if (!n || !p || !a) {
+          try {
+            const raw = localStorage.getItem("borkashop_user");
+            if (raw) {
+              const u = JSON.parse(raw);
+              if (!n && u.name) n = u.name;
+              if (!p && u.phone) p = u.phone;
+              if (!a && u.address) a = u.address;
+              if (u.deliveryArea) z = u.deliveryArea;
+            }
+          } catch {}
+        }
+
+        if (n) setName(n);
+        if (p) setPhone(p);
+        if (a) setAddress(a);
+        if (z) setDeliveryZone(z as "dhaka" | "outside_dhaka");
+      } else {
+        setName("");
+        setPhone("");
+        setAddress("");
+      }
     }
-  }, [quickOrderProduct]);
+  }, [quickOrderProduct, currentUser, role]);
 
   if (!quickOrderProduct) return null;
 
-  const deliveryFee = deliveryZone === "dhaka" ? 70 : 130;
   const subtotal = quickOrderProduct.price * quantity;
+  const isFreeShipping = Boolean(
+    shippingSettings?.freeShippingThreshold &&
+    shippingSettings.freeShippingThreshold > 0 &&
+    subtotal >= shippingSettings.freeShippingThreshold
+  );
+  const deliveryFee = isFreeShipping
+    ? 0
+    : deliveryZone === "dhaka"
+    ? (shippingSettings?.insideDhaka ?? 70)
+    : (shippingSettings?.outsideDhaka ?? 130);
   const total = subtotal + deliveryFee;
 
   const handleOrderSubmit = (e: React.FormEvent) => {
@@ -195,8 +238,8 @@ export default function QuickOrderModal() {
                 <p>
                   <strong>Delivery Zone:</strong>{" "}
                   {confirmedOrder.deliveryZone === "dhaka"
-                    ? "Inside Dhaka (৳70)"
-                    : "Outside Dhaka (৳130)"}
+                    ? `Inside Dhaka (${isFreeShipping ? "FREE" : `৳${shippingSettings?.insideDhaka ?? 70}`})`
+                    : `Outside Dhaka (${isFreeShipping ? "FREE" : `৳${shippingSettings?.outsideDhaka ?? 130}`})`}
                 </p>
                 <p className="text-sm font-bold text-[#4F213B] pt-2 border-t border-zinc-200">
                   Total Payable (Cash On Delivery): ৳{confirmedOrder.total.toLocaleString()}
@@ -408,7 +451,9 @@ export default function QuickOrderModal() {
                     />
                     <span className="text-xs font-semibold">Inside Dhaka</span>
                   </div>
-                  <span className="text-xs font-bold text-[#4F213B]">৳70</span>
+                  <span className="text-xs font-bold text-[#4F213B]">
+                    {isFreeShipping ? "FREE" : `৳${shippingSettings?.insideDhaka ?? 70}`}
+                  </span>
                 </label>
 
                 <label
@@ -428,7 +473,9 @@ export default function QuickOrderModal() {
                     />
                     <span className="text-xs font-semibold">Outside Dhaka</span>
                   </div>
-                  <span className="text-xs font-bold text-[#4F213B]">৳130</span>
+                  <span className="text-xs font-bold text-[#4F213B]">
+                    {isFreeShipping ? "FREE" : `৳${shippingSettings?.outsideDhaka ?? 130}`}
+                  </span>
                 </label>
               </div>
             </div>

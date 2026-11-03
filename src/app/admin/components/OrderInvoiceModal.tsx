@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useState } from "react";
+import Image from "next/image";
 import {
   FiX,
   FiPrinter,
@@ -11,6 +12,7 @@ import {
   FiMapPin,
   FiClock,
   FiUser,
+  FiShoppingBag,
 } from "react-icons/fi";
 import { useShop } from "@/context/ShopContext";
 import toast from "react-hot-toast";
@@ -311,12 +313,21 @@ export default function OrderInvoiceModal({
                     <tr key={idx}>
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2.5">
-                          <img
-                            src={item.productImage}
-                            alt={item.productName}
-                            crossOrigin="anonymous"
-                            className="w-10 h-10 rounded-lg object-cover bg-zinc-100 border border-zinc-200 shrink-0"
-                          />
+                          {item.productImage ? (
+                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-zinc-100 border border-zinc-200 shrink-0 relative">
+                              <Image
+                                src={item.productImage}
+                                alt={item.productName || "Product"}
+                                width={40}
+                                height={40}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          ) : (
+                            <div className="w-10 h-10 rounded-lg bg-zinc-100 border border-zinc-200 shrink-0 flex items-center justify-center text-zinc-400">
+                              <FiShoppingBag size={18} />
+                            </div>
+                          )}
                           <span className="font-bold text-zinc-900 line-clamp-1">
                             {item.productName}
                           </span>

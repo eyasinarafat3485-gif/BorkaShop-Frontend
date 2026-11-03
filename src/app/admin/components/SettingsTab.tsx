@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FiSettings,
   FiSave,
@@ -24,6 +24,20 @@ export default function SettingsTab() {
   const [enableBkash, setEnableBkash] = useState(shippingSettings.enableBkash);
   const [enableNagad, setEnableNagad] = useState(shippingSettings.enableNagad);
   const [enableRocket, setEnableRocket] = useState(shippingSettings.enableRocket);
+
+  useEffect(() => {
+    if (shippingSettings) {
+      setInsideDhaka(shippingSettings.insideDhaka);
+      setOutsideDhaka(shippingSettings.outsideDhaka);
+      setFreeShippingThreshold(shippingSettings.freeShippingThreshold);
+      setHelplinePhone(shippingSettings.helplinePhone);
+      setHelplineEmail(shippingSettings.helplineEmail);
+      setEnableCod(shippingSettings.enableCod);
+      setEnableBkash(shippingSettings.enableBkash);
+      setEnableNagad(shippingSettings.enableNagad);
+      setEnableRocket(shippingSettings.enableRocket);
+    }
+  }, [shippingSettings]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

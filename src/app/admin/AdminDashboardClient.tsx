@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useShop } from "@/context/ShopContext";
 import toast from "react-hot-toast";
 import AdminHeader from "./components/AdminHeader";
@@ -23,16 +23,89 @@ import OrderInvoiceModal from "./components/OrderInvoiceModal";
 import EditProductModal from "./components/EditProductModal";
 import { Product } from "@/types";
 
-export default function AdminDashboardClient() {
+export const TAB_TO_SLUG: Record<string, string> = {
+  overview: "",
+  products: "all-products",
+  "all-products": "all-products",
+  "add-product": "add-product",
+  brands: "brands",
+  categories: "categories",
+  tags: "tags",
+  attributes: "attributes",
+  reviews: "reviews",
+  orders: "orders",
+  customers: "customers",
+  notifications: "notifications",
+  analytics: "analytics",
+  settings: "settings",
+};
+
+export const SLUG_TO_TAB: Record<string, string> = {
+  "": "overview",
+  overview: "overview",
+  "all-products": "products",
+  products: "products",
+  "add-product": "add-product",
+  brands: "brands",
+  categories: "categories",
+  tags: "tags",
+  attributes: "attributes",
+  reviews: "reviews",
+  orders: "orders",
+  customers: "customers",
+  notifications: "notifications",
+  analytics: "analytics",
+  settings: "settings",
+};
+
+interface AdminDashboardClientProps {
+  initialTab?: string;
+}
+
+export default function AdminDashboardClient({ initialTab }: AdminDashboardClientProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { role } = useShop();
   const searchParams = useSearchParams();
   const urlTab = searchParams.get("tab");
   const initialStatus = searchParams.get("status") || "All";
 
-  const [activeTab, setActiveTab] = useState<string>(urlTab || "overview");
+  // Resolve initial tab from path / prop / query
+  const getTabFromPath = (path: string): string => {
+    const segment = path.replace(/^\/admin\/?/, "").split("/")[0] || "";
+    return SLUG_TO_TAB[segment] || segment || "overview";
+  };
+
+  const [activeTab, setActiveTabState] = useState<string>(() => {
+    if (initialTab && SLUG_TO_TAB[initialTab]) {
+      return SLUG_TO_TAB[initialTab];
+    }
+    if (urlTab && SLUG_TO_TAB[urlTab]) {
+      return SLUG_TO_TAB[urlTab];
+    }
+    return getTabFromPath(pathname);
+  });
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
+
+  // Sync route URL when activeTab changes
+  const setActiveTab = (tab: string) => {
+    setActiveTabState(tab);
+    const slug = TAB_TO_SLUG[tab] ?? tab;
+    const targetUrl = slug ? `/admin/${slug}` : "/admin";
+    if (pathname !== targetUrl) {
+      router.push(targetUrl);
+    }
+  };
+
+  // Sync activeTab if user navigates back/forward or enters direct URL
+  useEffect(() => {
+    const mapped = getTabFromPath(pathname);
+    if (mapped) {
+      setActiveTabState(mapped);
+    }
+  }, [pathname]);
 
   // Guard access: only admin allowed
   useEffect(() => {
@@ -61,7 +134,8 @@ export default function AdminDashboardClient() {
 
   useEffect(() => {
     if (urlTab) {
-      setActiveTab(urlTab);
+      const mapped = SLUG_TO_TAB[urlTab] || urlTab;
+      setActiveTab(mapped);
     }
   }, [urlTab]);
 
