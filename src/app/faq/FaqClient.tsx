@@ -34,7 +34,7 @@ const TOP_5_FAQS: FaqItem[] = [
     id: "faq-4",
     question: "সঠিক সাইজ কীভাবে নির্বাচন করব? (How can I choose the correct size?)",
     answer:
-      "অর্ডার করার পূর্বে আমাদের ওয়েবসাইটের 'Size Guide' চার্টটি দেখে নিন। এছাড়া সঠিক সাইজ নিশ্চিত করতে সরাসরি আমাদের WhatsApp নম্বরে (01793679254) আপনার উচ্চতা জানালে আমরা পারফেক্ট সাইজ সাজেস্ট করব।",
+      "অর্ডার করার পূর্বে আমাদের ওয়েবসাইটের 'Size Guide' চার্টটি দেখে নিন। এছাড়া সঠিক সাইজ নিশ্চিত করতে সরাসরি আমাদের WhatsApp নম্বরে (01810559258) আপনার উচ্চতা জানালে আমরা পারফেক্ট সাইজ সাজেস্ট করব।",
   },
   {
     id: "faq-5",
@@ -109,13 +109,13 @@ export default function FaqClient() {
             অন্য কোনো প্রশ্ন আছে বা আরও জানতে চান?
           </p>
           <a
-            href="https://wa.me/8801793679254"
+            href="https://wa.me/8801810559258"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-[#008a3e] hover:bg-[#007a37] text-white text-xs sm:text-sm font-semibold px-5 py-2.5 rounded-full transition-colors cursor-pointer shadow-sm"
           >
             <FaWhatsapp size={16} />
-            <span>WhatsApp-এ সরাসরি যোগাযোগ করুন: 01793679254</span>
+            <span>WhatsApp-এ সরাসরি যোগাযোগ করুন: 01810559258</span>
           </a>
         </div>
       </main>

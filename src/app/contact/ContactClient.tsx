@@ -305,7 +305,7 @@ export default function ContactClient() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
           {/* Phone Hotline */}
           <a
-            href="tel:+8801793679254"
+            href="tel:+8801810559258"
             className="group bg-white p-5 rounded-xl border border-zinc-200/90 shadow-xs hover:border-[#4F213B]/40 hover:shadow-md transition-all duration-200 flex items-start gap-4"
           >
             <div className="w-11 h-11 rounded-lg bg-[#4F213B]/10 text-[#4F213B] flex items-center justify-center shrink-0 group-hover:bg-[#4F213B] group-hover:text-white transition-colors">
@@ -316,7 +316,7 @@ export default function ContactClient() {
                 Call Us Directly
               </p>
               <p className="text-sm font-bold text-zinc-900 mt-0.5 group-hover:text-[#4F213B] transition-colors">
-                01793-679254
+                01810-559258
               </p>
               <p className="text-[11px] text-zinc-500 mt-0.5">
                 9:00 AM – 10:00 PM (Daily)
@@ -326,7 +326,7 @@ export default function ContactClient() {
 
           {/* WhatsApp Support */}
           <a
-            href="https://wa.me/8801793679254?text=Hello%20Borka%20Shop%20Team%2C%20I%20need%20assistance"
+            href="https://wa.me/8801810559258?text=Hello%20Borka%20Shop%20Team%2C%20I%20need%20assistance"
             target="_blank"
             rel="noopener noreferrer"
             className="group bg-white p-5 rounded-xl border border-zinc-200/90 shadow-xs hover:border-[#25D366]/40 hover:shadow-md transition-all duration-200 flex items-start gap-4"
@@ -339,7 +339,7 @@ export default function ContactClient() {
                 WhatsApp Chat
               </p>
               <p className="text-sm font-bold text-zinc-900 mt-0.5 group-hover:text-[#25D366] transition-colors">
-                +880 1793-679254
+                +880 1810-559258
               </p>
               <p className="text-[11px] text-emerald-600 font-medium mt-0.5 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -414,7 +414,7 @@ export default function ContactClient() {
 
               <div className="mt-5 pt-5 border-t border-zinc-100 flex items-center gap-3">
                 <a
-                  href="https://wa.me/8801793679254"
+                  href="https://wa.me/8801810559258"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 inline-flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#1EBE5D] text-white py-2.5 px-4 rounded-lg text-xs font-semibold shadow-xs transition-colors"
@@ -423,7 +423,7 @@ export default function ContactClient() {
                   <span>WhatsApp Help</span>
                 </a>
                 <a
-                  href="tel:+8801793679254"
+                  href="tel:+8801810559258"
                   className="flex-1 inline-flex items-center justify-center gap-2 bg-zinc-900 hover:bg-black text-white py-2.5 px-4 rounded-lg text-xs font-semibold shadow-xs transition-colors"
                 >
                   <FiPhone size={14} />

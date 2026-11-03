@@ -334,7 +334,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     insideDhaka: 70,
     outsideDhaka: 130,
     freeShippingThreshold: 4000,
-    helplinePhone: "01793 679 254",
+    helplinePhone: "01810 559 258",
     helplineEmail: "support@burkashop.com",
     enableCod: true,
     enableBkash: true,

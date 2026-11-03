@@ -20,7 +20,7 @@ export default function Footer() {
   const { setIsTrackOrderOpen, shippingSettings } = useShop();
   const pathname = usePathname();
 
-  const phone = shippingSettings?.helplinePhone || "01793 679 254";
+  const phone = shippingSettings?.helplinePhone || "01810 559 258";
   const cleanPhone = phone.replace(/[^0-9]/g, "");
   const waPhone = cleanPhone.startsWith("88") ? cleanPhone : `88${cleanPhone}`;
   const email = shippingSettings?.helplineEmail || "support@burkashop.com";

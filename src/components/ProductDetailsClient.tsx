@@ -203,7 +203,7 @@ export default function ProductDetailsClient({
   };
 
   const handleWhatsAppOrder = () => {
-    const rawPhone = shippingSettings?.helplinePhone || "01793679254";
+    const rawPhone = shippingSettings?.helplinePhone || "01810559258";
     const digits = rawPhone.replace(/[^0-9]/g, "");
     const phone = digits.startsWith("88") ? digits : `88${digits}`;
     const currentUrl = typeof window !== "undefined" ? window.location.href : "";

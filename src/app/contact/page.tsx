@@ -5,7 +5,7 @@ import ContactClient from "./ContactClient";
 export const metadata: Metadata = {
   title: "Contact Us – Borka Shop | Customer Support & Showroom",
   description:
-    "Get in touch with Borka Shop customer care. Call us at 01793-679254, WhatsApp direct chat, email support, or visit our Dhanmondi Dhaka showroom.",
+    "Get in touch with Borka Shop customer care. Call us at 01810-559258, WhatsApp direct chat, email support, or visit our Dhanmondi Dhaka showroom.",
   keywords: [
     "borka shop contact",
     "burqa shop phone number",

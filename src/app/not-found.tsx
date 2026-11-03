@@ -147,13 +147,13 @@ export default function NotFound() {
                 Need Help Finding Something?
               </p>
               <p className="text-[11px] text-zinc-500">
-                Hotline: +880 1793-679254 (Daily 9AM–10PM)
+                Hotline: +880 1810-559258 (Daily 9AM–10PM)
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <a
-              href="https://wa.me/8801793679254?text=Hello%20Borka%20Shop%2C%20I%20could%20not%20find%20a%20product%20page"
+              href="https://wa.me/8801810559258?text=Hello%20Borka%20Shop%2C%20I%20could%20not%20find%20a%20product%20page"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-[#25D366] hover:bg-[#1EBE5D] text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5"

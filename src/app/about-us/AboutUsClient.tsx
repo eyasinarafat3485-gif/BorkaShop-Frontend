@@ -468,13 +468,13 @@ export default function AboutUsClient() {
             </Link>
 
             <a
-              href="https://wa.me/8801793679254?text=%E0%A6%86%E0%A6%B8%E0%A6%B8%E0%A6%BE%E0%A6%B2%E0%A6%BE%E0%A6%AE%E0%A7%81%20%E0%A6%86%E0%A6%B2%E0%A6%BE%E0%A6%87%E0%A6%95%E0%A7%81%E0%A6%AE%2C%20%E0%A6%86%E0%A6%AE%E0%A6%BF%20Borka%20Shop%20%E0%A6%B8%E0%A6%AE%E0%A7%8D%E0%A6%AA%E0%A6%B0%E0%A7%8D%E0%A6%95%E0%A7%87%20%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A6%A4%E0%A7%87%20%E0%A6%9A%E0%A6%BE%E0%A6%87"
+              href="https://wa.me/8801810559258?text=%E0%A6%86%E0%A6%B8%E0%A6%B8%E0%A6%BE%E0%A6%B2%E0%A6%BE%E0%A6%AE%E0%A7%81%20%E0%A6%86%E0%A6%B2%E0%A6%BE%E0%A6%87%E0%A6%95%E0%A7%81%E0%A6%AE%2C%20%E0%A6%86%E0%A6%AE%E0%A6%BF%20Borka%20Shop%20%E0%A6%B8%E0%A6%AE%E0%A7%8D%E0%A6%AA%E0%A6%B0%E0%A7%8D%E0%A6%95%E0%A7%87%20%E0%A6%9C%E0%A6%BE%E0%A6%A8%E0%A6%A4%E0%A7%87%20%E0%A6%9A%E0%A6%BE%E0%A6%87"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-[#008a3e] hover:bg-[#007a37] text-white font-bold text-xs sm:text-sm px-6 py-3.5 rounded-sm shadow-md transition-all active:scale-[0.99] flex items-center gap-2 cursor-pointer"
             >
               <FaWhatsapp size={18} />
-              <span>WhatsApp: 01793679254</span>
+              <span>WhatsApp: 01810559258</span>
             </a>
           </div>
         </div>
