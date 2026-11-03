@@ -18,7 +18,6 @@ import {
   FiShoppingBag,
   FiGift,
 } from "react-icons/fi";
-import { FcGoogle } from "react-icons/fc";
 import toast from "react-hot-toast";
 import { signUp } from "@/lib/auth-client";
 import { useShop } from "@/context/ShopContext";
@@ -158,12 +157,6 @@ export default function RegisterClient() {
     }
   };
 
-  const handleGoogleAuth = () => {
-    toast("Google OAuth sign up will be available once Google Client ID is configured.", {
-      icon: "ℹ️",
-    });
-  };
-
   return (
     <div className="w-full bg-[#FAF9F8] min-h-[92vh] pb-16">
       {/* 1. Header Banner matching luxury Borbila theme */}
@@ -294,25 +287,6 @@ export default function RegisterClient() {
                 <p className="text-xs sm:text-sm text-zinc-500 mt-1.5 leading-relaxed">
                   Please fill in your basic information to get started.
                 </p>
-              </div>
-
-              {/* Social Sign Up Button */}
-              <button
-                type="button"
-                onClick={handleGoogleAuth}
-                className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50/80 transition-all text-xs sm:text-sm font-semibold text-zinc-700 shadow-2xs cursor-pointer group"
-              >
-                <FcGoogle size={20} className="group-hover:scale-105 transition-transform" />
-                <span>Sign up with Google</span>
-              </button>
-
-              {/* Divider */}
-              <div className="relative flex items-center justify-center my-6">
-                <div className="flex-1 border-t border-zinc-200" />
-                <span className="flex-shrink-0 bg-white px-4 text-[11px] text-zinc-400 font-bold uppercase tracking-wider whitespace-nowrap">
-                  Or Register With Email
-                </span>
-                <div className="flex-1 border-t border-zinc-200" />
               </div>
 
               {/* Registration Form with 2-Column Responsive Grid */}

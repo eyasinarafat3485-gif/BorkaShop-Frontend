@@ -669,23 +669,26 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   };
 
   const toggleWishlist = (productId: string) => {
-    setWishlist((prev) => {
-      const exists = prev.includes(productId);
-      let updated: string[];
-      if (exists) {
-        updated = prev.filter((id) => id !== productId);
-        toast("Removed from Wishlist", { icon: "🤍" });
-      } else {
-        updated = [...prev, productId];
-        toast.success("Added to Wishlist!", { icon: "❤️" });
-      }
-      try {
-        localStorage.setItem("borkashop_wishlist", JSON.stringify(updated));
-      } catch {
-        // ignore
-      }
-      return updated;
-    });
+    const exists = wishlist.includes(productId);
+    const updated = exists
+      ? wishlist.filter((id) => id !== productId)
+      : [...wishlist, productId];
+
+    setWishlist(updated);
+
+    try {
+      localStorage.setItem("borkashop_wishlist", JSON.stringify(updated));
+    } catch {
+      // ignore
+    }
+
+    syncToMyCollection({ wishlist: updated });
+
+    if (exists) {
+      toast("Removed from Wishlist", { icon: "🤍" });
+    } else {
+      toast.success("Added to Wishlist!", { icon: "❤️" });
+    }
   };
 
   const isInWishlist = (productId: string) => wishlist.includes(productId);

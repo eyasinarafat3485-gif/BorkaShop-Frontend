@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -34,7 +34,15 @@ export default function ProductDetailsClient({
   relatedProducts,
 }: ProductDetailsClientProps) {
   const router = useRouter();
-  const { addToCart, openQuickOrder, toggleWishlist, isInWishlist, shippingSettings } = useShop();
+  const {
+    addToCart,
+    openQuickOrder,
+    toggleWishlist,
+    isInWishlist,
+    shippingSettings,
+    currentUser,
+    role,
+  } = useShop();
 
   const isWishlisted = isInWishlist(product.id);
 
@@ -63,6 +71,125 @@ export default function ProductDetailsClient({
     product.alternateImage || product.image,
   ];
   const [activeImage, setActiveImage] = useState<string>(product.image);
+
+  // Reviews logic (MongoDB Atlas 'reviews' collection)
+  const isUserLoggedIn =
+    role === "user" ||
+    role === "admin" ||
+    Boolean(currentUser && (currentUser.email || currentUser.name));
+
+  interface ReviewData {
+    _id?: string;
+    id?: string;
+    productId: string;
+    productName?: string;
+    productImage?: string;
+    userAvatar?: string;
+    userId?: string | null;
+    name: string;
+    email: string;
+    rating: number;
+    comment: string;
+    createdAt?: string;
+  }
+
+  const [reviews, setReviews] = useState<ReviewData[]>([]);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(false);
+  const [reviewRating, setReviewRating] = useState<number>(5);
+  const [hoverRating, setHoverRating] = useState<number>(0);
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewerName, setReviewerName] = useState("");
+  const [reviewerEmail, setReviewerEmail] = useState("");
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+
+  // Sync user info if logged in
+  useEffect(() => {
+    if (currentUser?.name) setReviewerName(currentUser.name);
+    if (currentUser?.email) setReviewerEmail(currentUser.email);
+  }, [currentUser]);
+
+  // Fetch reviews from database
+  const fetchReviews = async () => {
+    try {
+      setIsLoadingReviews(true);
+      const res = await fetch(`${API_BASE}/reviews?productId=${encodeURIComponent(product.id)}&limit=10`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.reviews)) {
+          setReviews(data.reviews);
+        }
+      }
+    } catch (e) {
+      console.warn("Notice: could not fetch reviews:", e);
+    } finally {
+      setIsLoadingReviews(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReviews();
+  }, [product.id]);
+
+  const handleReviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const finalName = isUserLoggedIn
+      ? (currentUser?.name || reviewerName || "Verified Customer")
+      : reviewerName.trim();
+    const finalEmail = isUserLoggedIn
+      ? (currentUser?.email || reviewerEmail || "customer@burkashop.com")
+      : reviewerEmail.trim();
+
+    if (!finalName) {
+      toast.error("অনুগ্রহ করে আপনার নাম লিখুন");
+      return;
+    }
+    if (!finalEmail) {
+      toast.error("অনুগ্রহ করে আপনার ইমেইল লিখুন");
+      return;
+    }
+    if (!reviewComment.trim()) {
+      toast.error("অনুগ্রহ করে আপনার রিভিউ বা মন্তব্য লিখুন");
+      return;
+    }
+
+    setIsSubmittingReview(true);
+    try {
+      const res = await fetch(`${API_BASE}/reviews`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productId: product.id,
+          productName: product.name,
+          productImage: product.image,
+          userAvatar: (currentUser as any)?.image || "",
+          userId: currentUser?.id || null,
+          name: finalName,
+          email: finalEmail,
+          rating: reviewRating,
+          comment: reviewComment.trim(),
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success && data.review) {
+        toast.success("রিভিউ সফলভাবে জমা দেওয়া হয়েছে!", { icon: "⭐" });
+        setReviewComment("");
+        if (!isUserLoggedIn) {
+          setReviewerName("");
+          setReviewerEmail("");
+        }
+        setReviews((prev) => [data.review, ...prev]);
+      } else {
+        toast.error(data.error || "রিভিউ জমা দিতে সমস্যা হয়েছে");
+      }
+    } catch {
+      toast.error("সার্ভারে সমস্যা হয়েছে, অনুগ্রহ করে আবার চেষ্টা করুন");
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
 
   const handleAddToCart = () => {
     addToCart(product, selectedSize, selectedColor, quantity);
@@ -199,15 +326,29 @@ export default function ProductDetailsClient({
 
                 {/* Reviews & Ratings */}
                 <div className="flex items-center gap-3 text-sm">
-                  <div className="flex items-center text-amber-400">
-                    <FaStar size={14} />
-                    <FaStar size={14} />
-                    <FaStar size={14} />
-                    <FaStar size={14} />
-                    <FaStar size={14} />
+                  <div className="flex items-center text-amber-400 gap-0.5">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <FaStar
+                        key={star}
+                        size={14}
+                        className={
+                          reviews.length > 0
+                            ? star <=
+                              Math.round(
+                                reviews.reduce((sum, r) => sum + (r.rating || 5), 0) /
+                                  reviews.length
+                              )
+                              ? "text-amber-400"
+                              : "text-zinc-200"
+                            : star <= Math.round(product.rating || 5)
+                            ? "text-amber-400"
+                            : "text-zinc-200"
+                        }
+                      />
+                    ))}
                   </div>
                   <span className="text-zinc-500 text-xs sm:text-sm">
-                    ({product.reviewsCount} customer reviews)
+                    ({reviews.length} customer {reviews.length === 1 ? "review" : "reviews"})
                   </span>
                 </div>
 
@@ -403,7 +544,7 @@ export default function ProductDetailsClient({
                   : "border-transparent text-zinc-600 hover:text-zinc-900"
               }`}
             >
-              Reviews ({product.reviewsCount})
+              Reviews ({reviews.length})
             </button>
           </div>
 
@@ -458,41 +599,209 @@ export default function ProductDetailsClient({
 
             {activeTab === "reviews" && (
               <div className="space-y-6">
-                <div className="flex items-center gap-4 p-4 rounded-lg bg-zinc-50 border border-zinc-100">
+                {/* 1. Review Summary Score */}
+                <div className="flex items-center gap-4 p-4 rounded-xl bg-zinc-50 border border-zinc-100">
                   <div className="text-3xl font-extrabold text-[#4F213B]">
-                    {product.rating.toFixed(1)}
+                    {reviews.length > 0
+                      ? (
+                          reviews.reduce((sum, r) => sum + (r.rating || 5), 0) /
+                          reviews.length
+                        ).toFixed(1)
+                      : product.rating.toFixed(1)}
                   </div>
                   <div>
-                    <div className="flex items-center text-amber-400">
-                      <FaStar size={16} />
-                      <FaStar size={16} />
-                      <FaStar size={16} />
-                      <FaStar size={16} />
-                      <FaStar size={16} />
+                    <div className="flex items-center text-amber-400 gap-0.5">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <FaStar
+                          key={star}
+                          size={15}
+                          className={
+                            star <=
+                            Math.round(
+                              reviews.length > 0
+                                ? reviews.reduce((sum, r) => sum + (r.rating || 5), 0) /
+                                  reviews.length
+                                : product.rating
+                            )
+                              ? "text-amber-400"
+                              : "text-zinc-200"
+                          }
+                        />
+                      ))}
                     </div>
                     <p className="text-xs text-zinc-500 mt-0.5">
-                      Based on {product.reviewsCount} customer reviews
+                      Based on {reviews.length} customer {reviews.length === 1 ? "review" : "reviews"}
                     </p>
                   </div>
                 </div>
 
+                {/* 2. Real Original Last Recent Max 2-3 Reviews */}
                 <div className="space-y-4">
-                  <div className="border-b border-zinc-100 pb-3">
-                    <div className="flex items-center justify-between">
-                      <p className="font-bold text-zinc-900 text-sm">Shabnam Sultana</p>
-                      <span className="text-xs text-zinc-400">Verified Buyer</span>
+                  {reviews.length === 0 ? (
+                    <div className="text-center py-6 border border-dashed border-zinc-200 rounded-xl bg-zinc-50/50">
+                      <p className="text-xs sm:text-sm font-medium text-zinc-500">
+                        এখনো কোনো রিভিউ দেওয়া হয়নি। আপনি প্রথম রিভিউ দিন!
+                      </p>
                     </div>
-                    <div className="flex items-center text-amber-400 text-xs my-1">
-                      <FaStar />
-                      <FaStar />
-                      <FaStar />
-                      <FaStar />
-                      <FaStar />
+                  ) : (
+                    reviews.slice(0, 3).map((r, idx) => (
+                      <div
+                        key={r._id || r.id || idx}
+                        className="border-b border-zinc-100 pb-3.5 space-y-1.5"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-full bg-[#4F213B]/10 text-[#4F213B] font-bold text-xs flex items-center justify-center uppercase">
+                              {r.name?.charAt(0) || "U"}
+                            </div>
+                            <div>
+                              <p className="font-bold text-zinc-900 text-sm leading-tight">
+                                {r.name}
+                              </p>
+                              <p className="text-[10px] text-zinc-400">
+                                {r.createdAt
+                                  ? new Date(r.createdAt).toLocaleDateString("en-US", {
+                                      year: "numeric",
+                                      month: "short",
+                                      day: "numeric",
+                                    })
+                                  : "Verified Customer"}
+                              </p>
+                            </div>
+                          </div>
+                          <span className="text-[11px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                            Verified Buyer
+                          </span>
+                        </div>
+                        <div className="flex items-center text-amber-400 text-xs my-1 gap-0.5">
+                          {[1, 2, 3, 4, 5].map((s) => (
+                            <FaStar
+                              key={s}
+                              className={s <= (r.rating || 5) ? "text-amber-400" : "text-zinc-200"}
+                            />
+                          ))}
+                        </div>
+                        <p className="text-xs text-zinc-700 leading-relaxed">
+                          {r.comment}
+                        </p>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* 3. Review Comment Form (Logged in vs Guest) */}
+                <div className="mt-8 pt-6 border-t border-zinc-200">
+                  <h3 className="text-sm sm:text-base font-bold text-zinc-900 mb-3 font-serif">
+                    Write a Review (আপনার মতামত লিখুন)
+                  </h3>
+
+                  <form
+                    onSubmit={handleReviewSubmit}
+                    className="space-y-4 bg-zinc-50/70 p-4 sm:p-5 rounded-2xl border border-zinc-200/80"
+                  >
+                    {/* Star Rating Select */}
+                    <div>
+                      <label className="block text-xs font-bold text-zinc-700 mb-1.5">
+                        Your Rating (রেটিং দিন) *
+                      </label>
+                      <div className="flex items-center gap-1.5">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            onClick={() => setReviewRating(star)}
+                            onMouseEnter={() => setHoverRating(star)}
+                            onMouseLeave={() => setHoverRating(0)}
+                            className="p-1 text-lg sm:text-xl transition-transform hover:scale-110 cursor-pointer"
+                          >
+                            <FaStar
+                              className={
+                                star <= (hoverRating || reviewRating)
+                                  ? "text-amber-400"
+                                  : "text-zinc-300"
+                              }
+                            />
+                          </button>
+                        ))}
+                        <span className="text-xs font-semibold text-zinc-600 ml-2">
+                          ({reviewRating} / 5 Stars)
+                        </span>
+                      </div>
                     </div>
-                    <p className="text-xs text-zinc-600">
-                      ফেব্রিক কোয়ালিটি অনেক ভালো এবং ফিটিং পারফেক্ট হয়েছে। ডেলিভারিও অনেক দ্রুত পেয়েছি। ধন্যবাদ বোরকা শপ!
-                    </p>
-                  </div>
+
+                    {/* If Logged In: Auto show Name and Email; If Guest: inputs for Name & Email */}
+                    {isUserLoggedIn ? (
+                      <div className="bg-white p-3 rounded-xl border border-zinc-200 flex items-center justify-between text-xs">
+                        <div>
+                          <span className="text-zinc-500">Posting review as: </span>
+                          <span className="font-bold text-zinc-900">
+                            {currentUser?.name || reviewerName || "Logged-in User"}
+                          </span>
+                          <span className="text-zinc-400 ml-1">
+                            ({currentUser?.email || reviewerEmail || ""})
+                          </span>
+                        </div>
+                        <span className="px-2 py-0.5 rounded-full bg-[#4F213B]/10 text-[#4F213B] font-bold text-[10px]">
+                          Logged In
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-bold text-zinc-700 mb-1">
+                            Full Name (আপনার নাম) *
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={reviewerName}
+                            onChange={(e) => setReviewerName(e.target.value)}
+                            placeholder="যেমন: Eyasin Arafat"
+                            className="w-full px-3.5 py-2.5 bg-white border border-zinc-200 rounded-xl text-xs font-medium text-zinc-900 focus:outline-none focus:border-[#4F213B]"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-zinc-700 mb-1">
+                            Email Address (আপনার ইমেইল) *
+                          </label>
+                          <input
+                            type="email"
+                            required
+                            value={reviewerEmail}
+                            onChange={(e) => setReviewerEmail(e.target.value)}
+                            placeholder="যেমন: yourname@gmail.com"
+                            className="w-full px-3.5 py-2.5 bg-white border border-zinc-200 rounded-xl text-xs font-medium text-zinc-900 focus:outline-none focus:border-[#4F213B]"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Review Comment Textarea */}
+                    <div>
+                      <label className="block text-xs font-bold text-zinc-700 mb-1">
+                        Your Review / Comment (আপনার মন্তব্য লিখুন) *
+                      </label>
+                      <textarea
+                        required
+                        rows={3}
+                        value={reviewComment}
+                        onChange={(e) => setReviewComment(e.target.value)}
+                        placeholder="প্রোডাক্টের ফেব্রিক, কোয়ালিটি ও ফিটিংস কেমন লেগেছে জানান..."
+                        className="w-full px-3.5 py-2.5 bg-white border border-zinc-200 rounded-xl text-xs font-medium text-zinc-900 focus:outline-none focus:border-[#4F213B] resize-none"
+                      />
+                    </div>
+
+                    {/* Submit Button */}
+                    <div className="flex justify-end">
+                      <button
+                        type="submit"
+                        disabled={isSubmittingReview}
+                        className="bg-[#4F213B] hover:bg-[#3B152B] disabled:opacity-60 text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer"
+                      >
+                        {isSubmittingReview ? "Submitting..." : "Submit Review (রিভিউ জমা দিন)"}
+                      </button>
+                    </div>
+                  </form>
                 </div>
               </div>
             )}

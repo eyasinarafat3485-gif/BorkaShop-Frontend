@@ -11,7 +11,6 @@ import {
   FiArrowRight,
   FiLoader,
 } from "react-icons/fi";
-import { FcGoogle } from "react-icons/fc";
 import toast from "react-hot-toast";
 import { signIn, signUp } from "@/lib/auth-client";
 
@@ -87,13 +86,6 @@ export default function AuthModal() {
     }
   };
 
-  const handleGoogleAuth = () => {
-    // When Google OAuth is configured on Better Auth backend
-    toast("Google OAuth can be enabled once Google Client ID is configured in Backend/.env", {
-      icon: "ℹ️",
-    });
-  };
-
   const handleContinueAsGuest = () => {
     setRole("guest");
     toast("Continuing as Guest! You can place direct orders anytime.", {
@@ -156,23 +148,6 @@ export default function AuthModal() {
                 <FiArrowRight />
               </button>
             </div>
-          </div>
-
-          {/* Social Sign In (Google) */}
-          <button
-            type="button"
-            onClick={handleGoogleAuth}
-            className="w-full flex items-center justify-center gap-2.5 py-2.5 px-4 rounded-xl border border-zinc-300 hover:bg-zinc-50 transition-colors text-xs font-bold text-zinc-700 shadow-sm cursor-pointer"
-          >
-            <FcGoogle size={18} />
-            <span>Continue with Google</span>
-          </button>
-
-          <div className="relative flex items-center justify-center">
-            <div className="border-t border-zinc-200 w-full" />
-            <span className="bg-white px-3 text-[11px] text-zinc-400 font-semibold uppercase">
-              Or with email
-            </span>
           </div>
 
           {/* Email / Password Form */}
