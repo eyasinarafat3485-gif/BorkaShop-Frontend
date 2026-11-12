@@ -211,7 +211,6 @@ Visit [http://localhost:3000](http://localhost:3000) in your browser.
 - GitHub: [@eyasinarafat3485-gif](https://github.com/eyasinarafat3485-gif)
 - Live Project: [borkashop.vercel.app](https://borkashop.vercel.app)
 
-  
 ---
 
 <div align="center">
