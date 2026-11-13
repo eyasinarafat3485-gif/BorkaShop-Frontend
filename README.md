@@ -1,5 +1,10 @@
 <div align="center">
 
+  <img src="./public/preview.png" alt="BorkaShop Modest Fashion E-Commerce Platform Preview" width="100%" style="max-width: 820px; border-radius: 12px;" />
+
+  <br />
+  <br />
+
 # BorkaShop — Full-Stack Luxury Modest Fashion E-Commerce (Client)
 
 **A production-ready, conversion-focused e-commerce storefront and executive admin suite built with Next.js 16 (App Router), React 19, TypeScript, and Tailwind CSS v4.**
