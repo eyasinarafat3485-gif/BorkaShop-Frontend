@@ -1,13 +1,24 @@
 <div align="center">
 
-  <img src="./public/preview.png" alt="BorkaShop Modest Fashion E-Commerce Platform Preview" width="50%" />
-
-  <br />
-  <br />
-
-# BorkaShop — Full-Stack Luxury Modest Fashion E-Commerce (Client)
+# BorkaShop — Premium Modest Wear Store
 
 **A production-ready, conversion-focused e-commerce storefront and executive admin suite built with Next.js 16 (App Router), React 19, TypeScript, and Tailwind CSS v4.**
+
+  <a href="https://borkashop.vercel.app/" target="_blank">
+  <img
+    src="./public/preview.png"
+    alt="StyleHub Luxury Fashion Storefront Preview"
+    width="400"
+    height="450"
+    style="max-width: 100%; object-fit: cover; border-radius: 12px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);"
+  />
+</a>
+  <br />
+  <br />
+
+<p align="center">
+    <strong>Full-stack modest fashion e-commerce client built with Next.js 16, React 19, TypeScript & Tailwind CSS v4. Features 1-click guest checkout, Better Auth RBAC, client-side PDF invoicing, and a modular executive admin dashboard.</strong>
+  </p>
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://borkashop.vercel.app)
 [![Backend Repo](https://img.shields.io/badge/Backend_API-Render-46E3B7?style=for-the-badge&logo=render&logoColor=black)](https://github.com/eyasinarafat3485-gif/BorkaShop-Backend)
