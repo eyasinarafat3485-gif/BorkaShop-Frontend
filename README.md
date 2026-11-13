@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="./public/preview.png" alt="BorkaShop Modest Fashion E-Commerce Platform Preview" width="100%" style="max-width: 520px; border-radius: 12px;" />
+  <img src="./public/preview.png" alt="BorkaShop Modest Fashion E-Commerce Platform Preview" width="50%" />
 
   <br />
   <br />
